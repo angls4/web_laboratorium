@@ -1,0 +1,246 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+:root {
+  --white: #f9f6f4;
+  --dark: #2b2928;
+  --blue: #1c3b68;
+	--primary-font:   "Poppins", serif;
+	--secondary-font: "Noticia Text", serif;
+	--tertiary-font: "Lora", serif;
+}
+
+
+html{
+  background-color: var(--white);
+}
+
+/* start header css */
+.nav-menu{
+	display: flex;
+	flex-direction: row;
+	font-family: var(--primary-font);
+	column-gap: 15px;
+}
+
+.nav-menu a {
+	text-decoration: none;
+	color: black;
+}
+
+.nav-menu a {
+  text-decoration: none;
+  color: black;
+  transition: background-size 0.3s ease;
+  background-image: linear-gradient(var(--blue), var(--blue));
+  background-size: 0% 3px; /* Increased size for visibility */
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 5px; /* Added padding for space */
+}
+
+.nav-menu a:hover {
+  background-size: 100% 2px;
+}
+
+nav{
+	padding: 20px 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+	align-items: center;
+}
+
+nav img{
+  height: 120px;
+	position: relative;
+	left: 80px;
+}
+
+nav h1{
+	font-family: var(--secondary-font);
+	font-size: 32px;
+}
+
+main{
+	padding: 20px 50px;
+}
+
+article{
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center	;
+}
+
+article h1{
+	width: 100%;
+	padding: 20px 0;
+	border-top: 2px solid grey;
+	border-bottom: 2px solid grey;
+	font-size: 80px;
+	text-align: center;
+	font-family: var(--secondary-font);
+}
+
+article img{
+	margin: 20px 0;
+	background-color: aqua;
+	width: 100%;
+	object-fit: fill;
+	border-radius: 25px;
+	-moz-box-shadow: 1px 1px 49px -20px rgba(0,0,0,0.75);
+	-webkit-box-shadow: 1px 1px 49px -20px rgba(0,0,0,0.75);
+	box-shadow: 1px 1px 49px -20px rgba(0,0,0,0.75);
+}
+
+.container h2{
+  font-family: var(--secondary-font);
+  font-style: italic;
+  font-size: 60px;
+}
+
+.accordion {
+  .accordion-item {
+    border-bottom: 1px solid black;
+  }
+
+  button {
+    position: relative;
+    display: block;
+    text-align: left;
+    width: 100%;
+    padding-top: 30px;
+    color: black;
+    font-size: 60px;
+    font-weight: 400;
+    border: none;
+    background: none;
+    outline: none;
+    &:hover, &:focus {
+      cursor: pointer;
+      color: black;
+      &::after {
+        cursor: pointer;
+        color: black;
+        border: 1px solid black;
+      }
+    }
+    .accordion-title {
+      padding: 1em 1.5em 1em 0;
+      font-family: var(--secondary-font);
+      font-weight: 0;
+    }
+    .icon {
+      display: inline-block;
+      position: absolute;
+      top: 18px;
+      right: 0;
+      width: 22px;
+      height: 22px;
+      border: 1px solid;
+      border-radius: 22px;
+      &::before {
+        display: block;
+        position: absolute;
+        content: '';
+        top: 10px;
+        left: 6px;
+        width: 10px;
+        height: 2px;
+        background: currentColor;
+      }
+      &::after {
+        display: block;
+        position: absolute;
+        content: '';
+        top: 6px;
+        left: 10px;
+        width: 2px;
+        height: 10px;
+        background: currentColor;
+      }
+    }
+  }
+  button[aria-expanded='true'] {
+    color: black;
+    .icon {
+      &::after {
+        width: 0;
+      }
+    }
+    + .accordion-content {
+      opacity: 1;
+      max-height: 9em;
+      transition: all 200ms linear;
+      will-change: opacity, max-height;
+    }
+  }
+  .accordion-content {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 200ms linear, max-height 200ms linear;
+    will-change: opacity, max-height;
+    p {
+      font-family: var(--secondary-font);
+      font-size: 20px;
+      font-weight: 300;
+      margin: 1em 0;
+      text-align: justify;
+      line-height: 30px;
+    }
+  }
+}
+/* end header css */
+
+/* start body css */
+
+/* end body css */
+
+/* start footer css */
+
+/* end footer css */
+

@@ -1,0 +1,49 @@
+{% extends "home.html" %}
+{% block title %}Persyaratan{% endblock title %}
+{% block content %}
+<img src="{{ PERSYARATAN_URL }}" alt="image_persyaratan">
+{% if user.is_staff %}
+    {% if upload_success %}
+        <p>Upload successful!</p>
+    {% endif %}
+    {% if invalid %}
+        <p>Upload gagal</p>
+    {% endif %}
+    {% if delete_failed %}
+        <p>Delete gagal</p>
+    {% endif %}
+    {% if delete_success %}
+        <p>Delete successful</p>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.file.label_tag }} {{ form.file }}
+        <img id="preview" src="#" alt="your image" style="display:none;"/>
+        <button type="submit">Upload</button>
+    </form>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="delete" value="true">
+        <button type="submit">Delete</button>
+    </form>
+{% else %}
+    <p>Daftar <a href="{% url 'pendaftaran' %}">di sini</a>.</p>
+{% endif %}
+{% if user.is_staff %}
+<script>
+document.getElementById('id_file').onchange = function (evt) {
+    var tgt = evt.target || window.event.srcElement,
+        files = tgt.files;
+
+    if (FileReader && files && files.length) {
+        var fr = new FileReader();
+        fr.onload = function () {
+            document.getElementById('preview').style.display = 'block';
+            document.getElementById('preview').src = fr.result;
+        }
+        fr.readAsDataURL(files[0]);
+    }
+}
+</script>
+{% endif %}
+{% endblock content %}

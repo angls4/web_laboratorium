@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Noticia+Text:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Home{% endblock %}</title>
+    {% load static %} <link rel="stylesheet" href="{% static 'home.css' %}"> 
+</head>
+
+<header>
+    <nav>
+        <h1>Industrial<br> Laboratory <br><span>UMS</span></h1>
+        <img src="{% static 'Logolab.png' %}" alt="Logo">
+        {% include 'navbar.html' %}
+    </nav>
+</header>
+<body>
+    {% block content %}
+    <main>
+        <article>
+            <h1>WE ARE THE BEST ENGINEER</h1>
+            <img src="{% static 'lab.jpg' %}" alt="">
+        </article>
+        <div class="container">
+            <h2>Praktikum</h2>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <button id="accordion-button-1" aria-expanded="false"><span class="accordion-title">Pemrograman Komputer</span><span class="icon" aria-hidden="true"></span></button>
+                <div class="accordion-content">
+                    <p>Praktikum Pemrograman Komputer di Teknik Industri mengajarkan mahasiswa mengembangkan sistem informasi perusahaan menggunakan Python, MySQL, CSS, dan HTML. 
+                        Fokusnya pada integrasi konsep dasar pemrograman, manajemen database, dan desain antarmuka pengguna untuk menciptakan solusi efisien dan relevan dengan kebutuhan industri.</p>
+                </div>
+            </div>
+            <div class="accordion-item">
+                    <button id="accordion-button-2" aria-expanded="false"><span class="accordion-title">Statistika</span><span class="icon" aria-hidden="true"></span></button>
+                <div class="accordion-content">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Elementum sagittis vitae et leo duis ut. Ut tortor pretium viverra suspendisse potenti.</p>
+                </div>
+            </div>
+            <div class="accordion-item">
+                    <button id="accordion-button-3" aria-expanded="false"><span class="accordion-title">Perancangan Teknik Industri</span><span class="icon" aria-hidden="true"></span></button>
+                <div class="accordion-content">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Elementum sagittis vitae et leo duis ut. Ut tortor pretium viverra suspendisse potenti.</p>
+                </div>
+            </div>
+            <div class="accordion-item">
+                    <button id="accordion-button-4" aria-expanded="false"><span class="accordion-title">Produk Industri Kreatif</span><span class="icon" aria-hidden="true"></span></button>
+                <div class="accordion-content">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Elementum sagittis vitae et leo duis ut. Ut tortor pretium viverra suspendisse potenti.</p>
+                </div>
+            </div>
+            </div>
+        </div>
+    </main>
+    {% endblock %}
+</body>
+<footer>
+
+</footer>
+<script src="{% static 'script.js' %}"></script>
+</html>

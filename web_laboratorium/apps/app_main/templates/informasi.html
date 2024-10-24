@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Noticia+Text:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+      {% block title %}Informasi{% endblock title %}
+    </title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'Informasi.css' %}">
+</head>
+
+<header>
+    <nav>
+        <h1>Industrial<br> Laboratory <br><span>UMS</span></h1>
+        <img src="{% static 'Logolab.png' %}" alt="Logo">
+        {% include 'navbar.html' %}
+    </nav>
+</header>
+
+<body>
+  <article>
+    {% block content %}
+    <h2>Halaman Informasi</h2>
+    <div class="isi">
+      <a href="{% url 'persyaratan' %}">Persyaratan<span></span></a>
+      <a href="{% url 'pendaftaran' %}">Pendaftaran<span></span></a>
+      <a href="{% url 'dashboard' %}">Dashboard<span></span></a>
+    </div>
+    {% endblock content %}
+  </article>
+</body>
+</html>
+

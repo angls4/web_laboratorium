@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Noticia+Text:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <title>
+    {% block title %}Dashboard{% endblock title %}
+  </title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% load static %} <link rel="stylesheet" href="{% static 'dashboard_asisten.css' %}"> 
+</head>
+
+<header>
+  <nav>
+      <h1>Industrial<br> Laboratory <br><span>UMS</span></h1>
+      <img src="{% static 'Logolab.png' %}" alt="Logo">
+      {% include 'navbar.html' %}
+  </nav>
+</header>
+
+<body>
+{% block content %}
+  <h2 class="judul">Selamat datang, {{ user.first_name }}</h2>
+  <form method="post">
+  {% csrf_token %}
+  {% if user.is_staff %}
+    {{ formSet.management_form }}
+  {% endif %}
+
+  <table class="dashboard-table">
+    <thead>
+      <tr class="table-head">
+        {% if user.is_staff %}
+        {% comment %} <th>EMAIL</th> {% endcomment %}
+        <th>
+          {% if request.GET.sort_by == "nim" and request.GET.order == "asc" %}
+            <a href="?sort_by=email&order=desc">NIM &#9650;</a>
+          {% else %}
+            <a href="?sort_by=email&order=asc">NIM &#9660;</a>
+          {% endif %}
+        </th>
+
+        <th>
+          {% if request.GET.sort_by == "nama" and request.GET.order == "asc" %}
+            <a href="?sort_by=nama&order=desc">Nama &#9650;</a>
+          {% else %}
+            <a href="?sort_by=nama&order=asc">Nama &#9660;</a>
+          {% endif %}
+        </th>
+
+        <th>Sosial Media</th>
+        {% endif %}
+
+        <th>File</th>
+
+        <th>
+          {% if request.GET.sort_by == "nama_praktikum" and request.GET.order == "asc" %}
+            <a href="?sort_by=nama_praktikum&order=desc">Praktikum &#9650;</a>
+          {% else %}
+            <a href="?sort_by=nama_praktikum&order=asc">Praktikum &#9660;</a>
+          {% endif %}
+        </th>
+
+        <th>
+          {% if request.GET.sort_by == "uploaded_at" and request.GET.order == "asc" %}
+            <a href="?sort_by=uploaded_at&order=desc">Tanggal &#9650;</a>
+          {% else %}
+            <a href="?sort_by=uploaded_at&order=asc">Tanggal &#9660;</a>
+          {% endif %}
+        </th>
+
+        <th>
+          {% if request.GET.sort_by == "ipk" and request.GET.order == "asc" %}
+            <a href="?sort_by=ipk&order=desc">IPK &#9650;</a>
+          {% else %}
+            <a href="?sort_by=ipk&order=asc">IPK &#9660;</a>
+          {% endif %}
+        </th>
+
+        <th>
+          {% if request.GET.sort_by == "nilai" and request.GET.order == "asc" %}
+            <a href="?sort_by=nilai&order=desc">Nilai Praktikum &#9650;</a>
+          {% else %}
+            <a href="?sort_by=nilai&order=asc">Nilai Praktikum &#9660;</a>
+          {% endif %}
+        </th>
+
+        <th>
+          {% if request.GET.sort_by == "status" and request.GET.order == "asc" %}
+            <a href="?sort_by=status&order=desc">Status &#9650;</a>
+          {% else %}
+            <a href="?sort_by=status&order=asc">Status &#9660;</a>
+          {% endif %}
+        </th>
+
+      </tr>
+    </thead>
+
+    <tbody>
+        {% for row in rows %}
+        <tr>
+          {% if user.is_staff %}
+          {% comment %} <td>{{ row.file.user.email }}</td> {% endcomment %}
+          <td>{{ row.file.nim }}</td>
+          <td>{{ row.file.nama }}</td>
+          <td>
+            <p><a href="{{ row.file.linkedin }}" target="_blank">LinkedIn</a></p>
+            <p><a href="{{ row.file.instagram }}" target="_blank">Instagram</a></p>
+          </td>
+          {% endif %}
+          <td><a href="{{getFile_url}}{{ row.file.id }}" download>Download</a></td>
+          <td>{{ row.file.praktikum }}</td>
+          <td>{{ row.file.uploaded_at }}</td>
+          <td>{{ row.file.ipk }}</td>
+          <td>{{ row.file.nilai }}</td>
+          <td>
+            {% if not user.is_staff %}
+            {{ row.file.get_status_display }} 
+            {% else %}
+            {{ row.form.as_p }} 
+            {%endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="{% if user.is_staff %}10{% else %}6{% endif %}">
+            Belum ada pendaftaran. Daftar <a href="{% url 'pendaftaran' %}">di sini</a>.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if user.is_staff %}
+    <button type="submit">Apply</button>
+    {% endif %}
+  </form>
+{% endblock content %}
+</body>
+</html>

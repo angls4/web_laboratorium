@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Noticia+Text:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}Register{% endblock title %}
+    </title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'register.css' %}">
+</head>
+<header>
+    <nav>
+        <h1>Industrial<br> Laboratory <br><span>UMS</span></h1>
+        <img src="{% static 'Logolab.png' %}" alt="Logo">
+        {% include 'navbar.html' %}
+    </nav>
+</header>
+{% block content %}
+<body>
+    <h1 class='Judul'>User Registration</h1>
+    <div class="container">
+        <div class="form-kiri">
+            <form method="post">
+                {% csrf_token %}
+                <p>
+                    <label for="id_first_name">Name:</label>
+                    <input type="text" name="first_name" maxlength="150" required id="id_first_name">
+                    
+                    <span class="helptext">Nama lengkap</span>
+                    
+                    
+                </p>
+
+                
+                <p>
+                    <label for="id_email">Email:</label>
+                    <input type="email" name="email" maxlength="254" autofocus required id="id_email">
+                    
+                    <span class="helptext">Email UMS</span>
+                    
+                    
+                </p>
+
+                
+                <p>
+                    <label for="id_password1">Password:</label>
+                    <input type="password" name="password1" autocomplete="new-password" required id="id_password1">
+                    
+                    
+                </p>
+
+                
+                <p>
+                    <label for="id_password2">Password confirmation:</label>
+                    <input type="password" name="password2" autocomplete="new-password" required id="id_password2">
+                    
+                    <span class="helptext">Enter the same password as before, for verification.</span>
+                    <div id="password-error" style="color: red; display: none;">Passwords do not match!</div>
+                    
+                    
+                </p>
+
+                
+                {% comment %} <p>
+                    <label for="id_semester">Semester:</label>
+                    <input type="number" name="semester" min="0" id="id_semester">
+                    
+                    
+                </p> {% endcomment %}
+
+                  <p>
+                        <label for="id_angkatan">Angkatan:</label>
+                        <select name="angkatan" id="id_angkatan">
+                    <option value="2020">2020</option>
+
+                    <option value="2021">2021</option>
+
+                    <option value="2022">2022</option>
+
+                    <option value="2023">2023</option>
+
+                    <option value="2024" selected>2024</option>
+
+                    <option value="2025">2025</option>
+
+                    </select>
+                        
+                        
+                        
+                        
+                    </p>
+                <button type="submit">Register</button>
+            </form>
+            <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+            <p><a href="{% url 'home' %}">Home</a></p>
+        </div>
+        <img src="{% static 'FotoLogin.png' %}" alt="Gambar">
+    </div>
+</body>
+{% endblock content %}
+</html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const password1 = document.querySelector('input[name="password1"]');
+        const password2 = document.querySelector('input[name="password2"]');
+        const errorDiv = document.getElementById('password-error');
+
+        function checkPasswords() {
+            if (password1.value !== password2.value) {
+                errorDiv.style.display = 'block';
+            } else {
+                errorDiv.style.display = 'none';
+            }
+        }
+
+        password1.addEventListener('input', checkPasswords);
+        password2.addEventListener('input', checkPasswords);
+    });
+
+    {% if alert %}
+    alert("{{alert.message}}");
+    {% if alert.redirect %}
+    window.location.href = "{{alert.redirect}}";
+    {% endif %}
+    {% endif %}
+</script>
