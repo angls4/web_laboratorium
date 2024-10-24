@@ -2,9 +2,14 @@ from enum import verify
 from math import e
 from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login
+import os
+from dotenv import load_dotenv
+
+from web_laboratorium.apps.app_auth.models import UMSUser
 from .forms import UMSUserChangePasswordForm, UMSUserCreationForm,UMSUserAuthenticationForm
 from django.contrib.auth import views as auth_views
 from django.contrib.auth import get_user_model
+from django.contrib.auth import logout as auth_logout
 from web_laboratorium.apps.django_email_verification import (
     verify_email as verify_token,
     verify_password,
@@ -15,7 +20,8 @@ from web_laboratorium.apps.django_email_verification import (
     default_token_generator
 )
 
-
+load_dotenv()
+User = UMSUser
 class Logout(auth_views.LogoutView):
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
@@ -60,7 +66,6 @@ def login(request):
     return render(request, "login.html", {"form": form, "verify_link": verify_link, "reset_link": reset_link})
 
 def verify_email(request, user_id):
-    User = get_user_model()
 
     try:
         user = User.objects.get(pk=user_id)
@@ -80,7 +85,6 @@ def confirm_email(request, token):
     return render(request, "email_success_template.html", {"success": success, "user": user, "message": "Email berhasil diverifikasi."})
 
 def reset_password(request, email):
-    User = get_user_model()
     try:
         user = User.objects.get(email=email)
     except:
@@ -107,7 +111,24 @@ def change_password(request, token):
                 auth_login(request, user)
         else:
             return render(request, "password_change_template.html", {"form": form, "token": token, "user": user, "request": request})
-        return render(request, "email_success_template.html", {"success": success, "user": user, "message": f"Password berhasil diubah{" dan user berhasil terverifikasi" if is_verify else ""}."})
+        return render(request, "email_success_template.html", {"success": success, "user": user, "message": f"Password berhasil diubah{' dan user berhasil terverifikasi' if is_verify else ''}."})
     if not success_token:
         return render(request, "email_success_template.html", {"success": False, "user": user, "message": "."})
     return render(request, "password_change_template.html", {"form":UMSUserChangePasswordForm(), "token": token, "user": user, "request": request})
+
+def login_admin(request):
+    admin_email = os.environ.get("ADMIN_EMAIL")
+    admin_password = os.environ.get("ADMIN_PASSWORD")
+
+    try:
+        admin_user = User.objects.get(email=admin_email)
+    except User.DoesNotExist:
+        admin_user = User.objects.create_user(email=admin_email, password=admin_password, first_name="Admin")
+        admin_user.is_verified = True
+        admin_user.is_staff = True
+        admin_user.is_superuser = True
+        admin_user.save()
+
+    auth_logout(request)
+    auth_login(request, admin_user)
+    return redirect("home")

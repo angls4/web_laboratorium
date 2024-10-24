@@ -74,7 +74,7 @@ class UMSUser(AbstractBaseUser, PermissionsMixin):
     objects = UMSUserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["first_name", "linkedin", "instagram", "angkatan"]
+    REQUIRED_FIELDS = ["first_name", "angkatan"]
 
     def __str__(self):
         nim = self.email.split("@")[0]
