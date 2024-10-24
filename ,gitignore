@@ -1,9 +1,0 @@
-.idea
-.vscode
-.history
-.env
-.vercel
-django-env
-staticfiles_build
-web_laboratorium.zip
-db.sqlite3
