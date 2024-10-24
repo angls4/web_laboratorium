@@ -96,14 +96,18 @@ def change_password(request, token):
     success_token, user = default_token_generator.check_token(token, kind="PASSWORD")
     if request.method == "POST":
         form = UMSUserChangePasswordForm(request.POST)
+        is_verify = False
         if form.is_valid():
             password = form.cleaned_data.get("password")
             success, user = verify_password(token, password)
             if success:
+                if user.is_verified == False:
+                    user.is_verified = True
+                    is_verify = True
                 auth_login(request, user)
         else:
             return render(request, "password_change_template.html", {"form": form, "token": token, "user": user, "request": request})
-        return render(request, "email_success_template.html", {"success": success, "user": user, "message": "Password berhasil diubah."})
+        return render(request, "email_success_template.html", {"success": success, "user": user, "message": f"Password berhasil diubah{" dan user berhasil terverifikasi" if is_verify else ""}."})
     if not success_token:
         return render(request, "email_success_template.html", {"success": False, "user": user, "message": "."})
     return render(request, "password_change_template.html", {"form":UMSUserChangePasswordForm(), "token": token, "user": user, "request": request})
