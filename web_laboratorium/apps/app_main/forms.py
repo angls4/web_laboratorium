@@ -27,6 +27,11 @@ class UploadPersyaratan(forms.ModelForm):
 
 
 class UploadPendaftaran(forms.ModelForm):
+    file = forms.FileField(
+        widget=forms.ClearableFileInput(attrs={"id": "id_file", "accept": ".zip,.rar"}),
+        help_text="File praktikum",
+        label="File Praktikum"
+    )
     class Meta:
         model = Pendaftaran
         fields = ["file", "praktikum", "ipk", "nilai", "linkedin", "instagram"]

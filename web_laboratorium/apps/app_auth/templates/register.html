@@ -10,7 +10,7 @@
         {% block title %}Register{% endblock title %}
     </title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'register.css' %}">
+    <link rel="stylesheet" href="{% static 'registerr.css' %}">
 </head>
 <header>
     <nav>
@@ -21,87 +21,52 @@
 </header>
 {% block content %}
 <body>
-    <h1 class='Judul'>User Registration</h1>
+    <h1 class='judul'>User Registration</h1>
     <div class="container">
         <div class="form-kiri">
             <form method="post">
                 {% csrf_token %}
                 <p>
                     <label for="id_first_name">Name:</label>
-                    <input type="text" name="first_name" maxlength="150" required id="id_first_name">
-                    
-                    <span class="helptext">Nama lengkap</span>
-                    
-                    
+                    <input type="text" name="first_name" maxlength="150" required id="id_first_name" placeholder="Nama lengkap">
                 </p>
 
-                
                 <p>
+                    {{form.email.errors}}
                     <label for="id_email">Email:</label>
-                    <input type="email" name="email" maxlength="254" autofocus required id="id_email">
-                    
-                    <span class="helptext">Email UMS</span>
-                    
-                    
+                    <input type="email" name="email" maxlength="254" autofocus required id="id_email" placeholder="Email UMS">
                 </p>
 
-                
                 <p>
                     <label for="id_password1">Password:</label>
-                    <input type="password" name="password1" autocomplete="new-password" required id="id_password1">
-                    
-                    
+                    <input type="password" name="password1" autocomplete="new-password" required id="id_password1" placeholder="Masukkan Password">
                 </p>
 
-                
                 <p>
                     <label for="id_password2">Password confirmation:</label>
-                    <input type="password" name="password2" autocomplete="new-password" required id="id_password2">
-                    
-                    <span class="helptext">Enter the same password as before, for verification.</span>
+                    <input type="password" name="password2" autocomplete="new-password" required id="id_password2" placeholder="Masukkan Ulang Password">
                     <div id="password-error" style="color: red; display: none;">Passwords do not match!</div>
-                    
-                    
                 </p>
 
-                
-                {% comment %} <p>
-                    <label for="id_semester">Semester:</label>
-                    <input type="number" name="semester" min="0" id="id_semester">
-                    
-                    
-                </p> {% endcomment %}
-
-                  <p>
-                        <label for="id_angkatan">Angkatan:</label>
-                        <select name="angkatan" id="id_angkatan">
-                    <option value="2020">2020</option>
-
-                    <option value="2021">2021</option>
-
-                    <option value="2022">2022</option>
-
-                    <option value="2023">2023</option>
-
-                    <option value="2024" selected>2024</option>
-
-                    <option value="2025">2025</option>
-
+                <p>
+                    <label for="id_angkatan">Angkatan:</label>
+                    <select name="angkatan" id="id_angkatan">
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024" selected>2024</option>
+                        <option value="2025">2025</option>
                     </select>
-                        
-                        
-                        
-                        
-                    </p>
+                </p>
                 <button type="submit">Register</button>
             </form>
             <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
             <p><a href="{% url 'home' %}">Home</a></p>
         </div>
-        <img src="{% static 'FotoLogin.png' %}" alt="Gambar">
+        <img src="{% static 'asisten.jpg' %}" alt="Gambar" class="gambar">
     </div>
 </body>
-{% endblock content %}
 </html>
 
 <script>
@@ -109,7 +74,7 @@
         const password1 = document.querySelector('input[name="password1"]');
         const password2 = document.querySelector('input[name="password2"]');
         const errorDiv = document.getElementById('password-error');
-
+        
         function checkPasswords() {
             if (password1.value !== password2.value) {
                 errorDiv.style.display = 'block';
@@ -117,11 +82,11 @@
                 errorDiv.style.display = 'none';
             }
         }
-
+        
         password1.addEventListener('input', checkPasswords);
         password2.addEventListener('input', checkPasswords);
     });
-
+    
     {% if alert %}
     alert("{{alert.message}}");
     {% if alert.redirect %}
@@ -129,3 +94,4 @@
     {% endif %}
     {% endif %}
 </script>
+{% endblock content %}

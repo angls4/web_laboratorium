@@ -63,7 +63,7 @@ table {
 }
 
 .judul{
-  font-size: 48px;
+  font-size: 60px;
   font-family: var(--secondary-font);
   margin: 20px 50px;
   color: black;
@@ -72,6 +72,7 @@ table {
 .form-kiri{
   font-family: var(--primary-font);
   padding: 30px;
+  width: 600px;
 }
 
 .form-kiri h1{
@@ -97,12 +98,14 @@ form label {
 
 form input, form select { /* Common styles for all input fields */
   width: 100%; 
-  padding: 10px;
+  padding: 10 0px;
   border: none;
   border-bottom: 1px solid #ccc; 
   background-color: transparent;
   color: #fff; 
+  font-size: 20px;
 }
+
 
 form input:focus, form select:focus {
   outline: none;
@@ -131,4 +134,12 @@ button:hover {
   background-color: var(--white);
   color: black;
   transition: 0.5s;
+}
+
+.container img{
+  width: 650px;
+  height: 550px;
+  border-radius: 20px;
+  margin-top: 40px;
+  margin-right: 50px;
 }

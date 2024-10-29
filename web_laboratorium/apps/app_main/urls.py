@@ -14,5 +14,5 @@ urlpatterns = [
     path("informasi/", views.informasi, name="informasi"),
     path("files/<int:id>", views.getFile, name="get_file"),
     path("filePersyaratan/", views.getFilePersyaratan, name="get_file_persyaratan"),
+    path("pdf/", views.html_to_pdf_view, name="pdf"),
 ]
-

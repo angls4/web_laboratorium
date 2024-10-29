@@ -4,7 +4,6 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from datetime import datetime
 
 
-
 class Matkul(models.Model):
     nama_matkul = models.CharField(max_length=100)
 
@@ -65,14 +64,20 @@ class Pendaftaran(models.Model):
     praktikum = models.ForeignKey(Praktikum, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     STATUS_CHOICES = (
-        ('pemberkasan', 'Seleksi Pemberkasan'),
-        ('tes', 'Lolos Tes'),
-        ('w_asisten', 'Lolos Wawancara Asisten'),
-        ('w_dosen', 'Lolos Wawancara Dosen'),
-        ('diterima', 'Diterima'),
-        ('ditolak', 'Ditolak'),
+        (1, "Seleksi Pemberkasan"),
+        (2, "Lolos Seleksi Pemberkasan"),
+        (3, "Tes Microteaching"),
+        (4, "Lolos Microteaching"),
+        (5, "Tes Pemahaman"),
+        (6, "Lolos Pemahaman"),
+        (7, "Wawancara Asisten"),
+        (8, "Lolos Wawancara Asisten"),
+        (9, "Wawancara Dosen"),
+        (10, "Lolos Wawancara Dosen"),
+        (11, "Diterima"),
+        (-1, "Ditolak"),
     )
-    status = models.CharField(max_length=100, choices=STATUS_CHOICES, default='diproses')
+    status = models.IntegerField(choices=STATUS_CHOICES, default=1)
     ipk = models.DecimalField(
         max_digits=3,
         decimal_places=2,

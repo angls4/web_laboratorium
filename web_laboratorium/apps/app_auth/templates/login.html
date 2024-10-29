@@ -10,7 +10,7 @@
         {% block title %}Login{% endblock %}
     </title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'login.css' %}">
+    <link rel="stylesheet" href="{% static 'logins.css' %}">
 </head>
 <header>
     <nav>
@@ -30,17 +30,17 @@
                 {% csrf_token %}
                 {{ form.as_p }}
                 {% if verify_link %}
-                <p>Belum verifikasi email? <a href="{{ verify_link }}">Kirim ulang email verifikasi</a></p>
+                <h3 class="verifikasi">Belum verifikasi email? <a class="verifikasi" href="{{ verify_link }}">Kirim ulang email verifikasi</a></h3>
                 {% endif %}
                 {% if reset_link %}
-                <p>Lupa password? <a href="{{ reset_link }}">Reset password</a></p>
+                <h3 class="verifikasi">Lupa password? <a class="verifikasi" href="{{ reset_link }}">Reset password</a></h3>
                 {% endif %}
                 <button type="submit">Login</button>
             </form>
             <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
             <p><a href="{% url 'home' %}">Home</a></p>
         </div>
-        <img src="{% static 'FotoLogin.png' %}" alt="Gambar">``
+        <img src="{% static 'siwal.jpg' %}" alt="Gambar">
     </div>
 </body>
 {% endblock %}

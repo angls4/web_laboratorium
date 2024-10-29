@@ -15,6 +15,8 @@ import os
 from pickle import NONE
 from dotenv import load_dotenv
 
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -78,33 +80,33 @@ TEMPLATES = [
 WSGI_APPLICATION = 'web_laboratorium.wsgi.application'
 
 
-# Database
+# Database SQLITE
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+db_engine = os.getenv("DB_ENGINE", "django.db.backends.sqlite3")
 
-load_dotenv()
-
-DATABASES = {
-    "default": {
-        "ENGINE": os.getenv("DB_ENGINE", "django.db.backends.postgresql"),
-        "NAME": os.getenv("DB_DATABASE"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT", "5432"),
-        "OPTIONS": {
-            "sslmode": "require",
-        },
+if db_engine == "django.db.backends.sqlite3":
+    DATABASES = {
+        "default": {
+            "ENGINE": db_engine,
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
-
-
+else:
+    # Database Postgres
+    DATABASES = {
+        "default": {
+            "ENGINE": db_engine,
+            "NAME": os.getenv("DB_DATABASE"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+            "OPTIONS": {
+                "sslmode": "require",
+            },
+        }
+    }
 
 
 # Password validation
@@ -152,6 +154,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build", "static")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+SITE_URL = os.getenv("SITE_URL", "http://localhost:8000/")
+
 MEDIA_URL = "media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 PUBLIC_ROOT = os.path.join(MEDIA_ROOT, "public")
@@ -178,7 +182,7 @@ def password_change_callback(user, password):
 # Global Package Settings
 EMAIL_DESTINATION = os.getenv("EMAIL_DESTINATION", "")  # empty to not force all email to go to this address
 EMAIL_FROM_ADDRESS = os.getenv("EMAIL_FROM_ADDRESS", "")  # mandatory
-EMAIL_PAGE_DOMAIN = os.getenv("EMAIL_PAGE_DOMAIN", "http://localhost:8000/")  # mandatory (unless you use a custom link)
+EMAIL_PAGE_DOMAIN = os.getenv("SITE_URL", "http://localhost:8000/")  # mandatory (unless you use a custom link)
 EMAIL_MULTI_USER = False  # optional (defaults to False)
 
 # Email Verification Settings (mandatory for email sending)

@@ -62,6 +62,16 @@ table {
   background-color: var(--dark);
 }
 
+.container img{
+  margin-top: 23px;
+  margin-right: 30px;
+  width: 600px;
+  height: 500px;
+  object-fit: cover;
+  border-radius: 25px;
+  /* filter: grayscale(80%); */
+}
+
 .judul{
   font-size: 48px;
   font-family: var(--secondary-font);
@@ -95,18 +105,24 @@ form label {
   margin-bottom: 5px;
 }
 
-form input { /* Common styles for all input fields */
+form input {
   width: 100%; 
-  padding: 10px;
+  padding: 10px 0px;
   border: none;
   border-bottom: 1px solid #ccc; 
   background-color: transparent;
   color: #fff; 
+  font-size: 20px;
 }
 
 form input:focus {
   outline: none;
   border-bottom: 2px solid #fff; /* Highlight on focus */
+}
+
+.verifikasi{
+  padding-top: 10px;
+  font-size: 18px;
 }
 
 button {

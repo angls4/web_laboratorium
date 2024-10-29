@@ -1,18 +1,69 @@
+from cgitb import text
+from io import BytesIO
 import os
+from random import choice
+from threading import Thread
+from tkinter import E
 from urllib import response
 from django.shortcuts import render
-from django.http import HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound
 from django.conf import settings
+from django.template import Context, Template
+import pdfkit
 from .forms import UploadPersyaratan, UploadPendaftaran, UpdatePendaftaran
 from .models import Pendaftaran, Persyaratan, Praktikum
 from django.contrib.auth.decorators import login_required, user_passes_test
 import datetime
 from django.forms import formset_factory
+from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseForbidden, FileResponse
+from django.template.loader import render_to_string
+
 from django.contrib.auth import get_user_model
 from .models import Asisten
 
 User = get_user_model()
+
+
+def send_email_thread(targets, subject, text_path, html_path, context = None):
+    sender = settings.EMAIL_FROM_ADDRESS
+    if context is None:
+        context = {}
+    if settings.EMAIL_DESTINATION:
+        targets = [settings.EMAIL_DESTINATION]
+
+    subject = Template(subject).render(Context(context))
+    try:
+        html = render_to_string(html_path, context)
+    except:
+        html = None
+    try:
+        text = render_to_string(text_path, context)
+    except:
+        text = html
+
+    mail = EmailMultiAlternatives(subject, text, sender, targets)
+    if html:
+        mail.attach_alternative(html, "text/html")
+    mail.send()
+
+
+def send_email(targets, subject, html_path, context=None, thread=True, text_path=None):
+    if thread:
+        t = Thread(target=send_email_thread, args=(targets, subject, text_path, html_path, context))
+        t.start()
+    else:
+        send_email_thread(targets, subject, text_path, html_path, context)
+
+def send_status_email(user, pendaftaran, newStatus, thread=True):    
+    subject = "Status Pendaftaran Praktikum"
+    context = {
+        "nama": user.first_name,
+        "praktikum": pendaftaran.praktikum.practicum_name,
+        "status": newStatus,
+    }
+    send_email([user.email], subject, "email/status_email.html", context, thread)
+
 
 # Rest of the code
 
@@ -89,8 +140,11 @@ def pendaftaran(request):
 
 @login_required
 def dashboard(request):
-    sort_by = request.GET.get('sort_by', 'uploaded_at')
-    order = request.GET.get('order', 'asc')
+    tahun_filter = request.GET.get('tahun', None)
+    nilai_filter = request.GET.get('nilai', None)
+    status_filter = request.GET.get('status', None)
+    sort_by = request.GET.get('sort_by', 'uploaded_at') or 'uploaded_at'
+    order = request.GET.get('order', 'asc') or 'asc'
 
     getFile_url = request.build_absolute_uri('/') + "files/"
     updatePendaftaranFactory = formset_factory(UpdatePendaftaran, extra=0)
@@ -101,16 +155,22 @@ def dashboard(request):
                 for form in formSet.forms:
                     # print(form.cleaned_data['status'])
                     if form.cleaned_data:
-                        instance = Pendaftaran.objects.get(id=form.cleaned_data["id"])
+                        pendaftaran = Pendaftaran.objects.get(id=form.cleaned_data["id"])
                         if form.cleaned_data['status']:
-                            instance.status = form.cleaned_data['status']
-                            instance.save()
-                        # print(instance.status)
-                        if instance.status == "diterima":
-                            instance.user.is_staff = True
-                            instance.user.save()
-                            if not Asisten.objects.filter(user=instance.user, praktikum=instance.praktikum).exists():
-                                Asisten.objects.create(user=instance.user, praktikum=instance.praktikum)
+                            if pendaftaran.status != int(form.cleaned_data["status"]):
+                                status_label = dict(form.fields['status'].choices)[int(form.cleaned_data['status'])]
+                                send_status_email(pendaftaran.user, pendaftaran, status_label)
+                                # try:
+                                # except:
+                                #     print("Email failed to send", f'{pendaftaran.user.email} {form.cleaned_data["status"]}')
+                            pendaftaran.status = form.cleaned_data['status']
+                            pendaftaran.save()
+                        # print(pendaftaran.status)
+                        if pendaftaran.status == 11:
+                            pendaftaran.user.is_staff = True
+                            pendaftaran.user.save()
+                            if not Asisten.objects.filter(user=pendaftaran.user, praktikum=pendaftaran.praktikum).exists():
+                                Asisten.objects.create(user=pendaftaran.user, praktikum=pendaftaran.praktikum, periode=pendaftaran.uploaded_at.year)
         files = Pendaftaran.objects.all()
         initial_data = []
         for file in files:
@@ -123,7 +183,12 @@ def dashboard(request):
             })
         formSet = updatePendaftaranFactory(initial=initial_data)
         for form in formSet:
-            if form.initial["status"] == "diterima":
+            status_choices = dict(form.fields["status"].choices)
+            form.fields["status"].choices = [
+                (key, value) for key, value in status_choices.items()
+                if key == form.initial["status"] or key == form.initial["status"] + 1 or key == -1
+            ]
+            if form.initial["status"] == 11:
                 form.fields["status"].widget.attrs["disabled"] = "disabled"
         # formSet = updatePendaftaranFactory(queryset = files)``
         rows = [{"file": file,"form": form} for file, form in zip(files, formSet)]
@@ -139,8 +204,25 @@ def dashboard(request):
             "getFile_url": getFile_url,
             "rows": rows,
         }
+    rows = sorted(rows, key=lambda x: x["file"].__dict__[sort_by], reverse=True if order == 'desc' else False)
+    if tahun_filter:
+        rows = filter(lambda x: x["file"].uploaded_at.year == int(tahun_filter), rows)
+    if nilai_filter:
+        rows = filter(lambda x: x["file"].nilai == nilai_filter, rows)
+    if status_filter:
+        rows = filter(lambda x: x["file"].status == int(status_filter), rows)
+    context["rows"] = rows
 
-    context["rows"] = sorted(context["rows"], key=lambda x: x["file"].__dict__[sort_by], reverse=True if order == 'desc' else False)
+    tahun_options = range(2018, 2026)
+    nilai_options = [{"value": str(choice[0]), "label": choice[1]} for choice in Pendaftaran.NILAI_CHOICES]
+    status_options = [{"value": str(choice[0]), "label": choice[1]} for choice in Pendaftaran.STATUS_CHOICES]
+
+    context.update({
+        "tahun_options": tahun_options,
+        "nilai_options": nilai_options,
+        "status_options": status_options,
+    })
+
     return render(request, 'dashboard.html', context)
 
 
@@ -172,7 +254,7 @@ def asisten(request):
     praktikum_filter = request.GET.get('praktikum', None)
     sort_by = request.GET.get('sort_by', 'created_at')
     if not sort_by:
-        sort_by = 'nama'
+        sort_by = "created_at"
     order = request.GET.get('order', 'asc')
     if not order:
         order = 'asc'
@@ -196,3 +278,46 @@ def asisten(request):
         "periode_options": periode_options,
     }
     return render(request, 'asisten.html', context)
+
+
+def html_to_pdf_view(request):
+    # Define your HTML content
+    # html_string = """
+    #     <html>
+    #     <head><title>Test PDF</title></head>
+    #     <body>
+    #         <h1>Hello, PDF!</h1>
+    #         <p>This is a test PDF generated from HTML.</p>
+    #     </body>
+    #     </html>
+    # """
+
+    html_string = render_to_string("home.html", {"nama": "Test", "praktikum": "Test Praktikum", "status": "Test Status", "site_url": settings.SITE_URL})
+
+    # Configure pdfkit options
+    options = {
+        "page-size": "Letter",
+        "encoding": "UTF-8",
+    }
+
+    # Set wkhtmltopdf path if defined in settings
+    config = (
+        pdfkit.configuration(wkhtmltopdf=settings.PDFKIT_WKHTMLTOPDF)
+        if hasattr(settings, "PDFKIT_WKHTMLTOPDF")
+        else None
+    )
+
+    # Generate PDF as a blob in memory
+    # pdf_blob = BytesIO()
+    pdf_blob = pdfkit.from_string(html_string, options=options)
+
+    # Seek to the beginning of the BytesIO buffer
+    # pdf_blob.seek(0)
+
+    # Create a response object and serve the PDF
+    response = HttpResponse(pdf_blob, content_type="application/pdf")
+    response["Content-Disposition"] = (
+        'inline; filename="output.pdf"'  # Use 'attachment' instead of 'inline' to force download
+    )
+
+    return response

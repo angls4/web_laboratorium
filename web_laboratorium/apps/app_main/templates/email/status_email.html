@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Pendaftaran Praktikum</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .content {
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            color: #777;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Status Pendaftaran Praktikum {{ praktikum }}</h1>
+        </div>
+        <div class="content">
+            <p>Halo {{ nama }},</p>
+            <p>Status pendaftaran praktikum {{ praktikum }} Anda telah diperbarui menjadi: <strong>{{ status }}</strong>.</p>
+            <p>Terima kasih telah mendaftar. Jika Anda memiliki pertanyaan lebih lanjut, jangan ragu untuk menghubungi kami.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2023 Laboratorium. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
