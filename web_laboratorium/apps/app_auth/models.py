@@ -42,7 +42,7 @@ class UMSUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", True)
+        # extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         return self.create_user(email, password, **extra_fields)
 
@@ -76,6 +76,65 @@ class UMSUser(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "angkatan"]
 
+    @property
+    def nim(self):
+        return self.email.split("@")[0]
+
+    @property
+    def koordinator(self):
+        if self.is_superuser:
+            return "Admin"
+        current_year = f'{(datetime.datetime.now().year)}'
+        try:
+            return self.asisten_set.get(divisi="Koordinator", periode=current_year).praktikum
+        except:
+            return None
+        return self.asisten_set.filter(divisi="Koordinator", periode=current_year).first().praktikum
+
+    @property
+    def asisten(self):
+        if self.is_superuser:
+            return True
+        current_year = f'{(datetime.datetime.now().year)}'
+        try:
+            return self.asisten_set.get(periode=current_year)
+        except:
+            return None
+
+    @property
+    def praktikum(self):
+        if self.is_superuser:
+            return ""
+
+        return self.asisten.praktikum if self.asisten else None
+
     def __str__(self):
-        nim = self.email.split("@")[0]
-        return f"{nim} {self.first_name}"
+        return f"{self.nim} {self.first_name}"
+    
+    @property
+    def jabatan(self):
+        if self.is_superuser:
+            return "Admin"
+        elif self.koordinator:
+            return "Koordinator"
+        elif self.asisten:
+            return "Asisten"
+        else:
+            return "Peserta"
+
+    def get_dict(self):
+        user_data = {
+            "id": self.id,
+            "email": self.email,
+            "first_name": self.first_name,
+            "is_staff": self.is_staff,
+            "is_verified": self.is_active,
+            "is_superuser": self.is_superuser,
+            "asisten": self.asisten,
+            "koordinator": self.koordinator,
+            "praktikum": self.praktikum,
+            "nim": self.nim,
+            "angkatan": self.angkatan,
+            "jabatan": self.jabatan,
+        }
+        return user_data

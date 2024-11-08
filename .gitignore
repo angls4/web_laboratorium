@@ -6,3 +6,6 @@
 django-env
 web_laboratorium.zip
 db.sqlite3
+data.json
+node_modules
+media/uploads

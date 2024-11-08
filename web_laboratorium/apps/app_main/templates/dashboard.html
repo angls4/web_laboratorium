@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+  {% load static %} 
 <head>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -9,7 +10,7 @@
   </title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  {% load static %} <link rel="stylesheet" href="{% static 'dashboard_asisten.css' %}"> 
+  <link rel="stylesheet" href="{% static 'dashboard_asisten.css' %}"> 
 </head>
 
 <header>
@@ -22,158 +23,25 @@
 
 <body>
 {% block content %}
-  <h2 class="judul">Selamat datang, {{ user.first_name }}</h2>
+  <h2 class="judul">Selamat datang, {% if user.asisten %}{{ user.jabatan }} {{ user.praktikum }}{% endif %} {{ user.first_name }}</h2>
 
-  <form method="get" action="" class="filter">
-
-    <div class="filter-tahun">
-      <label for="tahun">tahun:</label>
-      <select name="tahun" id="tahun">
-        <option value="">--Pilih tahun--</option>
-        {% for year in tahun_options %}
-          <option value="{{ year }}" {% if request.GET.tahun == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="filter-nilai">
-      <label for="nilai">Nilai:</label>
-      <select name="nilai" id="nilai">
-        <option value="">--Pilih Nilai--</option>
-        {% for nilai in nilai_options %}
-          <option value="{{ nilai.value }}" {% if request.GET.nilai == nilai.value %}selected{% endif %}>{{ nilai.label }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="filter-status">
-      <label for="status">Status:</label>
-      <select name="status" id="status">
-        <option value="">--Pilih Status--</option>
-        {% for status in status_options %}
-          <option value="{{ status.value }}" {% if request.GET.status ==  status.value %}selected{% endif %}>{{ status.label }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <input type="hidden" name="sort_by" value="{{ request.GET.sort_by }}">
-    <input type="hidden" name="order" value="{{ request.GET.order }}">
-    <button type="submit">Filter</button>
-  </form>
-
-  <form method="post">
-  {% csrf_token %}
-  {% if user.is_staff %}
-    {{ formSet.management_form }}
-  {% endif %}
-
-  <table class="dashboard-table">
-    <thead>
-      <tr class="table-head">
-        {% if user.is_staff %}
-        {% comment %} <th>EMAIL</th> {% endcomment %}
-        <th>
-          {% if request.GET.sort_by == "nim" and request.GET.order == "asc" %}
-            <a href="?sort_by=nim&order=desc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">NIM &#9650;</a>
-          {% else %}
-            <a href="?sort_by=nim&order=asc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">NIM &#9660;</a>
-          {% endif %}
-        </th>
-
-        <th>
-          {% if request.GET.sort_by == "nama" and request.GET.order == "asc" %}
-            <a href="?sort_by=nama&order=desc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">Nama &#9650;</a>
-          {% else %}
-            <a href="?sort_by=nama&order=asc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">Nama &#9660;</a>
-          {% endif %}
-        </th>
-
-        <th>Sosial Media</th>
-        {% endif %}
-
-        <th>File</th>
-
-        <th>
-          {% if request.GET.sort_by == "nama_praktikum" and request.GET.order == "asc" %}
-            <a href="?sort_by=nama_praktikum&order=desc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">Praktikum &#9650;</a>
-          {% else %}
-            <a href="?sort_by=nama_praktikum&order=asc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">Praktikum &#9660;</a>
-          {% endif %}
-        </th>
-
-        <th>
-          {% if request.GET.sort_by == "uploaded_at" and request.GET.order == "asc" %}
-            <a href="?sort_by=uploaded_at&order=desc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">Tanggal &#9650;</a>
-          {% else %}
-            <a href="?sort_by=uploaded_at&order=asc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">Tanggal &#9660;</a>
-          {% endif %}
-        </th>
-
-        <th>
-          {% if request.GET.sort_by == "ipk" and request.GET.order == "asc" %}
-            <a href="?sort_by=ipk&order=desc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">IPK &#9650;</a>
-          {% else %}
-            <a href="?sort_by=ipk&order=asc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">IPK &#9660;</a>
-          {% endif %}
-        </th>
-
-        <th>
-          {% if request.GET.sort_by == "nilai" and request.GET.order == "asc" %}
-            <a href="?sort_by=nilai&order=desc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">Nilai Praktikum &#9650;</a>
-          {% else %}
-            <a href="?sort_by=nilai&order=asc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">Nilai Praktikum &#9660;</a>
-          {% endif %}
-        </th>
-
-        <th>
-          {% if request.GET.sort_by == "status" and request.GET.order == "asc" %}
-            <a href="?sort_by=status&order=desc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">Status &#9650;</a>
-          {% else %}
-            <a href="?sort_by=status&order=asc&tahun={{ request.GET.tahun }}&nilai={{ request.GET.nilai }}&status={{ request.GET.status }}">Status &#9660;</a>
-          {% endif %}
-        </th>
-
-      </tr>
-    </thead>
-
-    <tbody>
-        {% for row in rows %}
-        <tr>
-          {% if user.is_staff %}
-          {% comment %} <td>{{ row.file.user.email }}</td> {% endcomment %}
-          <td>{{ row.file.nim }}</td>
-          <td>{{ row.file.nama }}</td>
-          <td>
-            <p><a href="{{ row.file.linkedin }}" target="_blank">LinkedIn</a></p>
-            <p><a href="{{ row.file.instagram }}" target="_blank">Instagram</a></p>
-          </td>
-          {% endif %}
-          <td><a href="{{getFile_url}}{{ row.file.id }}" download>Download</a></td>
-          <td>{{ row.file.praktikum }}</td>
-          <td>{{ row.file.uploaded_at }}</td>
-          <td>{{ row.file.ipk }}</td>
-          <td>{{ row.file.nilai }}</td>
-          <td>
-            {% if not user.is_staff %}
-            {{ row.file.get_status_display }} 
-            {% else %}
-            {{ row.form.as_p }} 
-            {%endif %}
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="{% if user.is_staff %}10{% else %}6{% endif %}">
-            Belum ada pendaftaran. Daftar <a href="{% url 'pendaftaran' %}">di sini</a>.
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% if user.is_staff %}
-    <button type="submit">Apply</button>
-    {% endif %}
-  </form>
-{% endblock content %}
+  <div id="svelte-table"></div>
+  {% endblock content %}
 </body>
+
+
+<script src="{% static 'pdf_utils.js' %}"></script>
+<script>
+  // svelte
+  window.context = {{ context|safe }};
+  {% comment %} console.log({{ rows_json|safe }}); {% endcomment %}
+</script>
+{% if debug %}
+    <!-- Load from Vite dev server during development -->
+    <script type="module" src="http://localhost:5173/src/dashboard-entry.js"></script>
+{% else %}
+    <!-- Load the built static file in production -->
+    <script type="module" src="{% static 'svelte-js/svelte-table.js' %}"></script>
+{% endif %}
 </html>
+

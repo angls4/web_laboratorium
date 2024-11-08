@@ -1,0 +1,7 @@
+Hello {{ user.first_name }},
+
+You're almost there! Please click the link below to verify your account:
+
+{{ link }}
+
+Note: This link will expire on {{ expiry|time:"TIME_FORMAT" }}.

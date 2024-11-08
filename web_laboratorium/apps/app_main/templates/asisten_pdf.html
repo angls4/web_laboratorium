@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Asisten PDF</title>
+        <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td, tr {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+            nav {
+                padding: 10px 40px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid black;
+            }
+            nav img {
+                height: 120px;
+            }
+            nav h1 {
+                font-family: "Noticia Text", serif;
+                font-size: 32px;
+            }
+        </style>
+    </head>
+    <header>
+        <nav>
+            <h1>Industrial<br> Laboratory <br><span>UMS</span></h1>
+            <img src="{% static 'loa_images/image-1.png' %}" alt="Logo">
+        </nav>
+    </header>
+    <body>
+        <h1>Daftar Asisten</h1>
+        <p>Date: {{ date }}</p>
+        <p>Periode: {{ periode_filter }}</p>
+        <p>Praktikum: {{ praktikum_filter }}</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Asisten</th>
+                    <th>Periode</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ row.nama }}</td>
+                    <td>{{ row.nama_praktikum }}</td>
+                    <td>{{ row.periode }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">Belum ada Asisten.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </body>
+</html>

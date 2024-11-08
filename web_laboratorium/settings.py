@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-y6n8u_7*_#$&!peeg&088p4c1milhh)+61n7rh@p2k6=65e(+y'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = ["127.0.0.1", ".vercel.app", "localhost"]
 
@@ -107,6 +107,23 @@ else:
             },
         }
     }
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "bucket_name": os.getenv("AWS_STORAGE_BUCKET_NAME"),
+            "endpoint_url": os.getenv("AWS_S3_ENDPOINT_URL"),
+            "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
+            "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
+            "signature_version": "s3v4",
+            "region_name": os.getenv("AWS_S3_REGION_NAME"),
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 
 # Password validation
@@ -187,23 +204,23 @@ EMAIL_MULTI_USER = False  # optional (defaults to False)
 
 # Email Verification Settings (mandatory for email sending)
 EMAIL_MAIL_SUBJECT = "Confirm your email"
-EMAIL_MAIL_HTML = "mail_body.html"
-EMAIL_MAIL_PLAIN = "mail_body.txt"
+EMAIL_MAIL_HTML = "email/verify_email.html"
+EMAIL_MAIL_PLAIN = "email/verify_email.txt"
 EMAIL_MAIL_TOKEN_LIFE = 60 * 60  # one hour
 
 # Email Verification Settings (mandatory for builtin view)
-EMAIL_MAIL_PAGE_TEMPLATE = "email_success_template.html"
+EMAIL_MAIL_PAGE_TEMPLATE = "email_success.html"
 EMAIL_MAIL_CALLBACK = email_verified_callback
 
 # Password Recovery Settings (mandatory for email sending)
 EMAIL_PASSWORD_SUBJECT = "Change your password"
-EMAIL_PASSWORD_HTML = "password_body.html"
-EMAIL_PASSWORD_PLAIN = "password_body.txt"
+EMAIL_PASSWORD_HTML = "email/change_password_email.html"
+EMAIL_PASSWORD_PLAIN = "email/change_password_email.txt"
 EMAIL_PASSWORD_TOKEN_LIFE = 60 * 10  # 10 minutes
 
 # Password Recovery Settings (mandatory for builtin view)
 # EMAIL_PASSWORD_PAGE_TEMPLATE = "password_changed_template.html"
-EMAIL_PASSWORD_CHANGE_PAGE_TEMPLATE = "password_change_template.html"
+EMAIL_PASSWORD_CHANGE_PAGE_TEMPLATE = "password_change.html"
 EMAIL_PASSWORD_CALLBACK = password_change_callback
 
 # For Django Email Backend

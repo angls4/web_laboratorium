@@ -11,6 +11,40 @@
     </title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'persyaratan.css' %}">
+    <style>
+        .persyaratan-links {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            width: 30rem;
+        }
+
+        .persyaratan-links table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .persyaratan-links th, .persyaratan-links td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .persyaratan-links th {
+            background-color: #f2f2f2;
+        }
+
+        .persyaratan-links a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .persyaratan-links a:hover {
+            text-decoration: underline;
+        }
+</style>
 </head>
 
 <header>
@@ -23,17 +57,21 @@
 <body>
 {% block content %}
 <div class="gambar">
+    {% if persyaratan %}
     <h1>Persyaratan Pendaftaran Praktikum</h1>
-    <img src="{{ PERSYARATAN_URL }}" alt="image_persyaratan" width="355" height="502">
+    <img src="{{ persyaratan.file.url }}" alt="image_persyaratan" width="355" height="502">
+    {% else %}
+    <h1>Belum ada pendaftaran terbuka</h1>
+    {% endif %}
 </div>
 <div class="upload">
-
-    {% if user.is_staff %}
-        {% if upload_success %}
-            <p>Upload successful!</p>
-        {% endif %}
-        {% if invalid %}
-            <p>Upload gagal</p>
+    
+    {% if user.asisten %}
+    {% if upload_success %}
+    <p>Upload successful!</p>
+    {% endif %}
+    {% if invalid %}
+    <p>Upload gagal</p>
         {% endif %}
         {% if delete_failed %}
             <p>Delete gagal</p>
@@ -41,29 +79,62 @@
         {% if delete_success %}
             <p>Delete successful</p>
         {% endif %}
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.file.label_tag }} {{ form.file }}
-            {% comment %} <img id="preview" src="#" alt="your image" style="display:none; width: 500px; height: 500px;"/> {% endcomment %}
-            <button type="submit">Upload</button>
-        </form>
+        {% if form.instance.pk %}
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="hidden" name="delete" value="true">
-            <button type="submit">Delete</button>
+            <button type="submit">Delete Pengumuman</button>
+        </form>
+    </br>
+        {% else %}
+        <h1>Buat pengumuman baru</h1>
+    </br>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% comment %} {{ form.file.label_tag }} {{ form.file }} {% endcomment %}
+            {{ form.as_p }}
+            {% comment %} <img id="preview" src="#" alt="your image" style="display:none; width: 500px; height: 500px;"/> {% endcomment %}
+            <button type="submit">{% if form.instance.pk %}Edit Pengumuman{% else %}Buat Pengumuman{% endif %}</button>
         </form>
     {% else %}
+    {% if persyaratan %}
         <p>Daftar <a href="{% url 'pendaftaran' %}">di sini</a>.</p>
     {% endif %}
-    {% if user.is_staff %}
+    {% endif %}
+    {% if user.asisten %}
+    </br>
+    <h1>Semua Pengumuman</h1>
+    <div class="persyaratan-links">
+        <table>
+            <thead>
+                <tr>
+                    <th>Pengumuman</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pp in persyaratans %}
+                    <tr>
+                        <td><a {% if pp.pk is persyaratan.pk %}style="color:purple;"{% endif %} href="{% url 'persyaratan_detail' id=pp.pk %}">{{ pp }}</a></td>
+                        {% comment %} <td>{% if pp.pk is persyaratan.pk %}(Aktif){% endif %}</td> {% endcomment %}
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="1" style="text-align: center;"><a href="{% url 'persyaratan' %}">Buat Baru</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    {% if user.asisten %}
 </div>
 <script>
-document.getElementById('id_file').onchange = function (evt) {
-    var tgt = evt.target || window.event.srcElement,
+    document.getElementById('id_file').onchange = function (evt) {
+        var tgt = evt.target || window.event.srcElement,
         files = tgt.files;
-
-    if (FileReader && files && files.length) {
-        var fr = new FileReader();
+        
+        if (FileReader && files && files.length) {
+            var fr = new FileReader();
         fr.onload = function () {
             document.getElementById('preview').style.display = 'block';
             document.getElementById('preview').src = fr.result;

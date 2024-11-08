@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% load static %}
 <html lang="en">
   <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,7 +9,7 @@
     </title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% load static %} <link rel="stylesheet" href="{% static 'asisten.css' %}"> 
+     <link rel="stylesheet" href="{% static 'asisten.css' %}"> 
   </head>
   
   <header>
@@ -30,7 +30,7 @@
           <select name="praktikum" id="praktikum">
             <option value="">--Pilih Praktikum--</option>
             {% for praktikum in praktikum_options %}
-              <option value="{{ praktikum }}" {% if request.GET.praktikum == praktikum.practicum_name %}selected{% endif %}>{{ praktikum }}</option>
+              <option value="{{ praktikum }}" {% if request.GET.praktikum == praktikum.praktikum_name %}selected{% endif %}>{{ praktikum }}</option>
             {% endfor %}
           </select>
         </div>
@@ -53,26 +53,26 @@
         <thead>
           <tr class="head">
             <th>
-              {% if request.GET.sort_by == "nama" and request.GET.order == "asc" %}
-              <a href="?sort_by=nama&order=desc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Nama &#9650;</a>
-              {% else %}
+              {% if request.GET.sort_by == "nama" and request.GET.order == "desc" %}
               <a href="?sort_by=nama&order=asc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Nama &#9660;</a>
+              {% else %}
+              <a href="?sort_by=nama&order=desc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Nama{% if request.GET.sort_by == "nama" %} &#9650{% endif %}</a>
               {% endif %}
             </th>
             
             <th>
-              {% if request.GET.sort_by == "nama_praktikum" and request.GET.order == "asc" %}
-              <a href="?sort_by=nama_praktikum&order=desc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Asisten &#9650;</a>
-              {% else %}
+              {% if request.GET.sort_by == "nama_praktikum" and request.GET.order == "desc" %}
               <a href="?sort_by=nama_praktikum&order=asc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Asisten &#9660;</a>
+              {% else %}
+              <a href="?sort_by=nama_praktikum&order=desc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Asisten{% if request.GET.sort_by == "nama_praktikum" %} &#9650{% endif %}</a>
               {% endif %}
             </th>
             
             <th>
-              {% if request.GET.sort_by == "periode" and request.GET.order == "asc" %}
-              <a href="?sort_by=periode&order=desc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Periode &#9650;</a>
-              {% else %}
+              {% if request.GET.sort_by == "periode" and request.GET.order == "desc" %}
               <a href="?sort_by=periode&order=asc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Periode &#9660;</a>
+              {% else %}
+              <a href="?sort_by=periode&order=desc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Periode{% if request.GET.sort_by == "periode" %} &#9650{% endif %}</a>
               {% endif %}
             </th> 
             </tr>
@@ -98,8 +98,17 @@
       </table>
   
       <a href="http://127.0.0.1:8000/admin/" class="button">Halaman Admin</a>
+      <a class="button" onclick="generatePDF()">Generate PDF</a>
     </main>
   </body>
-{% endblock content %}
+  {% endblock content %}
+  <script src="{% static 'pdf_utils.js' %}"></script>
+  <script>
+    htmlString = `
+      {{ html_string }}
+    `;
+    function generatePDF() {
+      string_to_pdf(htmlString);
+    }
+  </script>
 </html>
-

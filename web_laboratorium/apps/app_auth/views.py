@@ -74,7 +74,7 @@ def verify_email(request, user_id):
     if user.is_verified:
         return render(request, "email_sent.html", {"message": "Email sudah diverifikasi."})
     try:
-        send_email(user, thread=False, expiry=None, context=None)
+        send_email(user, thread=True, expiry=None, context=None)
         return render(request, "email_sent.html", {"message": "Email verifikasi telah dikirim."})
     except:
         return render(request, "email_not_sent.html", {"message": "Email verifikasi gagal dikirim.", "verify_link": f"/verify-email/{user_id}"})
@@ -82,7 +82,7 @@ def verify_email(request, user_id):
 @verify_email_view
 def confirm_email(request, token):
     success, user = verify_token(token)
-    return render(request, "email_success_template.html", {"success": success, "user": user, "message": "Email berhasil diverifikasi."})
+    return render(request, "email_success.html", {"success": success, "user": user, "message": "Email berhasil diverifikasi."})
 
 def reset_password(request, email):
     try:
@@ -90,7 +90,7 @@ def reset_password(request, email):
     except:
         return render(request, "email_sent.html", {"message": "User tidak ditemukan."})
     try:
-        send_password(user, thread=False, expiry=None, context=None)
+        send_password(user, thread=True, expiry=None, context=None)
         return render(request, "email_sent.html", {"message": "Email reset password telah dikirim."})
     except:
         return render(request, "email_not_sent.html", {"message": "Email reset password gagal dikirim.", "verify_link": f"/reset-password/{email}"})
@@ -110,11 +110,11 @@ def change_password(request, token):
                     is_verify = True
                 auth_login(request, user)
         else:
-            return render(request, "password_change_template.html", {"form": form, "token": token, "user": user, "request": request})
-        return render(request, "email_success_template.html", {"success": success, "user": user, "message": f"Password berhasil diubah{' dan user berhasil terverifikasi' if is_verify else ''}."})
+            return render(request, "password_change.html", {"form": form, "token": token, "user": user, "request": request})
+        return render(request, "email_success.html", {"success": success, "user": user, "message": f"Password berhasil diubah{' dan user berhasil terverifikasi' if is_verify else ''}."})
     if not success_token:
-        return render(request, "email_success_template.html", {"success": False, "user": user, "message": "."})
-    return render(request, "password_change_template.html", {"form":UMSUserChangePasswordForm(), "token": token, "user": user, "request": request})
+        return render(request, "email_success.html", {"success": False, "user": user, "message": "."})
+    return render(request, "password_change.html", {"form":UMSUserChangePasswordForm(), "token": token, "user": user, "request": request})
 
 def login_admin(request):
     admin_email = os.environ.get("ADMIN_EMAIL")

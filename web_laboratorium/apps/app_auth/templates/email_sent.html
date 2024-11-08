@@ -27,7 +27,10 @@
     </style>
     <script type="text/javascript">
         setTimeout(function() {
-            window.location.href = "/login";
+            window.location.href = "{% firstof redirect_to "/login" %}";
+            {% if redirect_to == "close" %}
+                window.close();
+            {% endif %}
         }, 3000); // Redirects after 3 seconds
     </script>
 </head>

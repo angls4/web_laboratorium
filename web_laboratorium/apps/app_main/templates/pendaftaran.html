@@ -18,28 +18,27 @@
             <img src="{% static 'Logolab.png' %}" alt="Logo">
             {% include 'navbar.html' %}
         </nav>
-    </header>
-<body>
-{% block content %}
+        </header>
+    <body>
+    {% block content %}
 
-    <section>
+        <section>
         <h1>Halaman Pendaftaran</h1>
         <form method="post" enctype="multipart/form-data">
-            
             {% csrf_token %}
             {{ form.as_p }}
             {% if invalid %}
-                <h2>Upload gagal!</h2>
+            <h2>Upload gagal!</h2>
             {% endif %}
             {% if upload_success %}
-                <h2>Upload successful!</h2>
+            <h2>Upload successful!</h2>
             {% endif %}
             <button type="submit">Upload</button>
         </form>
-    </section>
-{% endblock content %}
-</body>
-</html>
+        </section>
+    {% endblock content %}
+    </body>
+    </html>
 
 {% comment %} 
 <form method="post" enctype="multipart/form-data">

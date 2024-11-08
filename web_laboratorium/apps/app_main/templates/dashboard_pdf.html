@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Asisten PDF</title>
+        <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td, tr {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+            nav {
+                padding: 10px 40px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid black;
+            }
+            nav img {
+                height: 120px;
+            }
+            nav h1 {
+                font-family: "Noticia Text", serif;
+                font-size: 32px;
+            }
+        </style>
+    </head>
+    <header>
+        <nav>
+            <h1>Industrial<br> Laboratory <br><span>UMS</span></h1>
+            <img src="{% static 'loa_images/image-1.png' %}" alt="Logo">
+        </nav>
+    </header>
+    <body>
+        
+        <h1>Daftar Pendaftaran{% if user.asisten %} ({{ user.jabatan }}){% endif %}</h1>
+        <p>Date: {{ date }}</p>
+        <p>Nama: {{ user.first_name }}</p>
+        <p>NIM: {{ user.nim }}</p>
+        <p>Email: {{ user.email }}</p>
+        {% if user.asisten %}
+        <p>Praktikum: {{ user.praktikum }}</p>
+        <p>Tahun: {{ tahun_filter }}</p>
+        <p>Nilai: {{ nilai_filter }}</p>
+        <p>Status: {{ status_filter }}</p>
+        {% endif %}
+        <table class="dashboard-table">
+            <thead>
+            <tr class="table-head">
+                {% if user.asisten %}
+                {% comment %} <th>EMAIL</th> {% endcomment %}
+                <th>NIM</th>
+                <th>Nama</th>
+                <th>Sosial Media</th>
+                {% endif %}
+                {% comment %} <th>Praktikum</th> {% endcomment %}
+                <th>Tanggal</th>
+                <th>Tanggal Edit</th>
+                <th>IPK</th>
+                <th>Nilai Praktikum</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in rows %}
+            <tr>
+                {% if user.asisten %}
+                {% comment %} <td>{{ row.user.email }}</td> {% endcomment %}
+                <td>{{ row.user.nim }}</td>
+                <td>{{ row.user.first_name }}</td>
+                <td>
+                <p>LinkedIn: {{ row.linkedin }}</p>
+                <p>Instagram: {{ row.instagram }}</p>
+                </td>
+                {% endif %}
+                {% comment %} <td>{{ row.praktikum }}</td> {% endcomment %}
+                <td>{{ row.uploaded_at }}</td>
+                <td>{{ row.edited_at }}</td>
+                <td>{{ row.ipk }}</td>
+                <td>{{ row.nilai }}</td>
+                <td>
+                {{ row.get_selection_status_display }} 
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="{% if user.asisten %}10{% else %}6{% endif %}">
+                Belum ada pendaftaran. Daftar <a href="{% url 'pendaftaran' %}">di sini</a>.
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </body>
+</html>
