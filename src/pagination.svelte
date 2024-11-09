@@ -74,7 +74,7 @@
             sort_by,
             order
         }
-        const response = await axios.get('/dashboard/pdf', {params});
+        const response = await axios.get('api/pendaftaran/pdf', {params});
         const html_string = response.data?.html_string;
         const options = user.asisten ? { width: "1800px", orientation: "landscape" } : {};
         string_to_pdf(html_string, options);
@@ -187,7 +187,7 @@
                             <a href={`/edit_pendaftaran/${row.id}`}>Edit</a>
                             {#if user.koordinator}
                                 <a href={`/delete_pendaftaran/${row.id}`}>Delete</a>
-                                {#if row.status === 11}
+                                {#if row.status === 6}
                                     <p>
                                         <a href={`/send_loa/${row.id}`} target="_blank">Kirim LOA</a>
                                     </p>

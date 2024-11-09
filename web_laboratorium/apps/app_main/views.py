@@ -192,16 +192,7 @@ def pendaftaran(request,id=None):
     else:
         return render(request, "pendaftaran.html", context)
 
-@login_required
-def delete_pendaftaran(request, id):
-    try:
-        pendaftaran = Pendaftaran.objects.get(pk=id)
-        if pendaftaran.user != request.user and not request.user.koordinator:
-            return HttpResponseForbidden("Bukan pendaftar")
-        pendaftaran.delete()
-        return redirect("dashboard")
-    except Pendaftaran.DoesNotExist:
-        return HttpResponseNotFound("Pendaftaran tidak ada")
+
 
 # @login_required
 # def dashboard(request):
@@ -233,7 +224,7 @@ def delete_pendaftaran(request, id):
 #                             pendaftaran.save()
 #                         # print(pendaftaran.status)
 #                         pendaftaran = Pendaftaran.objects.get(id=form.cleaned_data["id"])
-#                         if pendaftaran.status == 11:
+#                         if pendaftaran.status == 6:
 #                             # pendaftaran.user.is_staff = True
 #                             # pendaftaran.user.save()
 #                             if not Asisten.objects.filter(user=pendaftaran.user, praktikum=pendaftaran.praktikum).exists():
@@ -276,7 +267,7 @@ def delete_pendaftaran(request, id):
 #                 (key, value) for key, value in status_choices.items()
 #                 if key == form.initial["selection_status"] or key == form.initial["selection_status"] + 1 or key == -1
 #             ]
-#             if form.initial["selection_status"] == 11 or form.initial["selection_status"] == -1:
+#             if form.initial["selection_status"] == 6 or form.initial["selection_status"] == -1:
 #                 form.fields["selection_status"].widget.attrs["disabled"] = "disabled"
 #         # formSet = updatePendaftaranFactory(queryset = files)``
 #         rows = [{"file": file,"form": form} for file, form in zip(files, formSet)]
@@ -367,6 +358,7 @@ def dashboard(request):
             "nilai": pendaftaran.get_nilai_display(),
             "status_id": pendaftaran.status,
             "status": pendaftaran.get_selection_status_display(),
+            "berkas_revision": pendaftaran.berkas_revision,
         })
  
     tahun_options = list(range(2018, 2026))
@@ -383,50 +375,7 @@ def dashboard(request):
 
     return render(request, 'dashboard.html', {"debug":True, "context": json.dumps(context)})
 
-@login_required
-def dashboard_pdf(request):
-    tahun_filter = request.GET.get('tahun') or ''
-    nilai_filter = request.GET.get('nilai') or ''
-    status_filter = request.GET.get('status') or ''
-    sort_by = request.GET.get('sort_by', 'uploaded_at') or 'uploaded_at'
-    order = request.GET.get('order', 'asc') or 'asc'
-    if sort_by == 'nama':
-        sort_by = 'user__first_name'
-    if sort_by == 'nim':
-        sort_by = 'user__email'
-    reversed_columns = ["user__first_name", "user__email", "nilai"]
-    if sort_by in reversed_columns:
-        order = 'desc' if order == 'asc' else 'asc'
-    sort_by = f"-{sort_by}" if order == 'desc' else sort_by
 
-    if request.user.asisten:
-        filter_kwargs = {}
-        if tahun_filter:
-            filter_kwargs["uploaded_at__year"] = int(tahun_filter)
-        if nilai_filter:
-            filter_kwargs["nilai"] = nilai_filter
-        if status_filter:
-            filter_kwargs["selection_status"] = int(status_filter)
-        if not request.user.is_superuser:
-            filter_kwargs["praktikum"] = request.user.asisten.praktikum
-        pendaftarans = Pendaftaran.objects.filter(**filter_kwargs).order_by(sort_by)
-    else:
-        pendaftarans = Pendaftaran.objects.filter(user=request.user)
-
-    rows = pendaftarans
-
-    pdf_context = {
-        "user": request.user,
-        # "debug": True,
-        "rows": rows,
-        "tahun_filter": tahun_filter,
-        "nilai_filter": nilai_filter,
-        "status_filter": dict(Pendaftaran.STATUS_CHOICES)[int(status_filter)] if status_filter else '',
-        "date": datetime.datetime.now().strftime("%d %B %Y %H:%M"),
-    }
-
-    html_string = render_to_string("dashboard_pdf.html", pdf_context)
-    return JsonResponse({"html_string": html_string})
     
     # return render(request, 'dashboard.html', {"debug":True, "context": json.dumps(context)})
 
@@ -498,7 +447,7 @@ def send_loa(request, pendaftaran_id):
         return HttpResponseForbidden("You are not authorized to access this page.")
     try:
         pendaftaran = Pendaftaran.objects.get(pk=pendaftaran_id)
-        if pendaftaran.status == 11:
+        if pendaftaran.status == 6:
             try:
                 send_email(
                     [pendaftaran.user.email],

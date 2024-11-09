@@ -4,7 +4,6 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from datetime import datetime, timedelta
 
 from web_laboratorium.apps.app_auth.models import UMSUser
-from web_laboratorium.apps.app_main.views import pendaftaran
 
 
 def PeriodeField():
@@ -36,6 +35,9 @@ NILAI_CHOICES = (
 )
 def NilaiField():
     return models.CharField(max_length=2, choices=NILAI_CHOICES, default='B')
+
+def NumberNilaiField():
+    return models.IntegerField(null=True, blank=True, max_length=3, validators=[MinValueValidator(0), MaxValueValidator(100)])
 class Matkul(models.Model):
     nama_matkul = models.CharField(max_length=100)
 
@@ -122,6 +124,14 @@ class Pendaftaran(models.Model):
         (6, "Diterima"),
         (-1, "Ditolak"),
     )
+    nilai_tm = NumberNilaiField()
+    nilai_tp = NumberNilaiField()
+    nilai_wa = NumberNilaiField()
+    nilai_wd = NumberNilaiField()
+
+    catatan_wa = models.TextField(null=True, blank=True)
+    catatan_wd = models.TextField(null=True, blank=True)
+
     selection_status = models.IntegerField(choices=STATUS_CHOICES, default=1)
     ipk = IPKField()
     linkedin = models.URLField(blank=True)
@@ -140,9 +150,88 @@ class Pendaftaran(models.Model):
     def praktikum(self):
         return self.persyaratan.praktikum
 
+    @property
+    def berkas_revision(self):
+        total_unrevised = 0
+        total_revised = 0
+        for jenis in Berkas.jenis_choices:
+            unrevised = 0
+            revised = 0
+            try:
+                last_two = self.berkas_set.filter(jenis=jenis[0]).order_by("uploaded_at")
+                try:
+                    if last_two[1].komentar_set.exists():
+                        unrevised = 1
+                except:
+                    pass
+                try:
+                    if last_two[0].komentar_set.exists():
+                        unrevised = 1
+                    else:
+                        if unrevised > 0:
+                            revised = 1
+                            unrevised = 0
+                except:
+                    if unrevised > 0:
+                        revised = 1
+                        unrevised = 0
+            except:
+                pass
+            total_unrevised += unrevised
+            total_revised += revised
+        return {"unrevised": total_unrevised, "revised": total_revised}
+
+    def nilai_status(self,status=None):
+        if status == None:
+            status = self.selection_status
+        if status == 2:
+            return self.nilai_tm
+        if status == 3:
+            return self.nilai_tp
+        if status == 4:
+            return self.nilai_wa
+        if status == 5:
+            return self.nilai_wd
+        return -1
+
+    def catatan_status(self,status=None):
+        if status == None:
+            status = self.selection_status
+        if status == 4:
+            return self.catatan_wa
+        if status == 5:
+            return self.catatan_wd
+        return -1
+
+    def set_nilai_status(self, nilai, status=None):
+        if status == None:
+            status = self.selection_status
+        if status == 2:
+            self.nilai_tm = nilai
+        if status == 3:
+            self.nilai_tp = nilai
+        if status == 4:
+            self.nilai_wa = nilai
+        if status == 5:
+            self.nilai_wd = nilai
+        self.save()
+        return self.nilai_status(status)
+
+    def set_catatan_status(self, catatan, status=None):
+        if status == None:
+            status = self.selection_status
+        if status == 4:
+            self.catatan_wa = catatan
+        if status == 5:
+            self.catatan_wd = catatan
+        self.save()
+        return self.catatan_status(status)
+
     def next_status(self):
-        if self.selection_status == 11 or self.selection_status == -1:
-            return self.selection_status
+        if self.selection_status == 6 or self.selection_status == -1:
+            return None
+        if self.nilai_status() == None: # kalau status skrg perlu nilai tapi balum diisi
+            return None
         self.selection_status += 1
         self.save()
         return self.selection_status
@@ -153,7 +242,7 @@ class Pendaftaran(models.Model):
 class Berkas(models.Model):
     file = models.FileField(upload_to=settings.PENDAFTARAN_URL)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    edited_at = models.DateTimeField(null=True, blank=True, default=None)
+    # edited_at = models.DateTimeField(null=True, blank=True, default=None)
     pendaftaran = models.ForeignKey(Pendaftaran, on_delete=models.CASCADE)
     jenis_choices = (
         ('st', 'Sertifikat TOL'),
@@ -168,6 +257,12 @@ class Berkas(models.Model):
         ('ff', 'Foto Formal'),
     )
     jenis = models.CharField(max_length=2, choices=jenis_choices)
-    komentar = models.TextField(null=True, blank=True)
+    # catatan = models.TextField(null=True, blank=True)
+    # catatan_at = models.DateTimeField(null=True, blank=True, default=None)
 
+class Komentar(models.Model):
+    berkas = models.ForeignKey(Berkas, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    content = models.TextField()
+    user = models.ForeignKey(UMSUser, on_delete=models.CASCADE)
     # {"-ACTIVE" if self.active else ""}

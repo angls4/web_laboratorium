@@ -187,7 +187,7 @@
                             <a href={`/edit_pendaftaran/${row.id}`}>Edit</a>
                             {#if user.koordinator}
                                 <a href={`/delete_pendaftaran/${row.id}`}>Delete</a>
-                                {#if row.status === 11}
+                                {#if row.status === 6}
                                     <p>
                                         <a href={`/send_loa/${row.id}`} target="_blank">Kirim LOA</a>
                                     </p>
