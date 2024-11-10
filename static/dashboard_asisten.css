@@ -46,6 +46,7 @@ table {
   --white: #f9f6f4;
   --dark: #2b2928;
   --blue: #1c3b68;
+  --light-blue: #4d8dc1;
 	--primary-font:   "Poppins", serif;
 	--secondary-font: "Noticia Text", serif;
 	--tertiary-font: "Lora", serif;
@@ -110,12 +111,22 @@ html{
 
 .filter button{
   font-size: 16px;
+  margin-top: 0px;
   font-family: var(--primary-font);
   padding: 5px 50px;
   border-radius: 25px;
   border-color: transparent;
   background-color: var(--dark);
   color: white;
+}
+.filter input{
+  padding: 5px 10px;
+  /* text-align: center; */
+  font-size: 14px;
+  font-family: var(--primary-font);
+  background-color: transparent;
+  border-radius: 5px;
+  border: 2px solid black;
 }
 
 nav{
@@ -202,4 +213,23 @@ button:hover {
   background-color: var(--blue);
   color: white;
   transition: 0.5s;
+}
+
+.dashboard-table button{
+  font-size: 14px;
+  padding: 5px 10px;
+  margin: 0;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  background-color: var(--blue);
+  color: var(--white);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.dashboard-table button:disabled {
+  background-color: var(--white);
+  border: 1px solid var(--blue);
+  color: black
 }

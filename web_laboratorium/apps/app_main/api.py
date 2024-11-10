@@ -1,10 +1,23 @@
 import datetime
+import json
+import mimetypes
 from operator import ne
 from django.http import HttpResponseForbidden, HttpResponseNotFound, JsonResponse
 
-from web_laboratorium.apps.app_main.models import Berkas, Pendaftaran
+from web_laboratorium.apps.app_main.models import Asisten, Berkas, Pendaftaran, Praktikum
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.template.loader import render_to_string
+
+
+def extension_to_mime(extension):
+    if not extension.startswith('.'):
+        extension = f'.{extension}'
+    if extension == ".webp":
+        return "image/webp"
+
+    mime_type, _ = mimetypes.guess_type(f"file{extension}")
+    
+    return mime_type
 
 @login_required
 def dashboard_pdf(request):
@@ -51,39 +64,134 @@ def dashboard_pdf(request):
         ),
         "date": datetime.datetime.now().strftime("%d %B %Y %H:%M"),
     }
-
+    file_name = f'{request.user.first_name}_dashboard_{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")}.pdf'
     html_string = render_to_string("dashboard_pdf.html", pdf_context)
-    return JsonResponse({"html_string": html_string})
+    return JsonResponse({"html_string": html_string, "status": 200, "file_name": file_name})
+
+# def asisten(request):
+#     periode_filter = request.GET.get('periode') or ''
+#     praktikum_filter = request.GET.get('praktikum') or ''
+#     sort_by = request.GET.get('sort_by', 'created_at')
+#     if not sort_by:
+#                sort_by = "created_at"
+#     order = request.GET.get('order', 'asc')
+#     if not order:
+#         order = 'asc'
+
+#     rows = Asisten.objects.all()
+#     for row in rows:
+#         row.nama = row.user.first_name
+#         row.nama_praktikum = row.praktikum.praktikum_name
+#     reversed_columns = ["nama", "nama_praktikum"]
+#     rows = sorted(rows, key=lambda x: x.__dict__[sort_by], reverse=True if order == ('desc' if sort_by not in reversed_columns else 'asc') else False)
+#     if periode_filter:
+#         rows = list(filter(lambda x: x.periode == periode_filter, rows))
+#         print(rows)
+#     if praktikum_filter:
+#         rows = list(filter(lambda x: x.nama_praktikum == praktikum_filter, rows))
+
+#     praktikum_options = Praktikum.objects.all()
+#     periode_options = range(2018, 2026)
+
+#     context = {
+#         "rows": rows,
+#         "praktikum_options": praktikum_options,
+#         "periode_options": periode_options,
+#     }
+#     context["html_string"] = render_to_string("asisten_pdf.html", {
+#         "rows": rows,
+#         "date": datetime.datetime.now().strftime("%d %B %Y %H:%M"),
+#         "periode_filter": periode_filter,
+#         "praktikum_filter": praktikum_filter,
+#     })
+#     return render(request, 'asisten.html', context)
+
+def asisten_pdf(request):
+    periode_filter = request.GET.get("periode") or ""
+    praktikum_filter = request.GET.get("praktikum") or ""
+    sort_by = request.GET.get("sort_by", "created_at")
+    if not sort_by:
+        sort_by = "created_at"
+    order = request.GET.get("order", "asc")
+    if not order:
+        order = "asc"
+
+    rows = Asisten.objects.all()
+    for row in rows:
+        row.nama = row.user.first_name
+        row.nama_praktikum = row.praktikum.praktikum_name
+    reversed_columns = ["nama", "nama_praktikum"]
+    rows = sorted(
+        rows,
+        key=lambda x: x.__dict__[sort_by],
+        reverse=True if order == ("desc" if sort_by not in reversed_columns else "asc") else False,
+    )
+    if periode_filter:
+        rows = list(filter(lambda x: x.periode == periode_filter, rows))
+        print(rows)
+    if praktikum_filter:
+        rows = list(filter(lambda x: x.nama_praktikum == praktikum_filter, rows))
+
+    praktikum_options = Praktikum.objects.all()
+    periode_options = range(2018, 2026)
+
+    pdf_context = {
+        "user": request.user,
+        # "debug": True,
+        "rows": rows,
+        "praktikum_options": praktikum_options,
+        "periode_options": periode_options,
+        "periode_filter": periode_filter,
+        "praktikum_filter": praktikum_filter,
+        "date": datetime.datetime.now().strftime("%d %B %Y %H:%M"),
+    }
+    file_name = f'{request.user.first_name}_asisten_{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")}.pdf'
+    html_string = render_to_string("asisten_pdf.html", pdf_context)
+    return JsonResponse({"html_string": html_string, "status": 200, "file_name": file_name})
+    
 
 
 def next_status(request):
-    if request.method == "POST":
-        id = request.POST.get("id")
+    id = request.POST.get("id")
+    data = None
+    try:
+        data = json.loads(request.POST.get("data"))
+    except:
+        pass
+    if id:
+        nilai = None
         pendaftaran = Pendaftaran.objects.get(id=id)
+        if data:
+            nilai = pendaftaran.set_nilai_status(data)
+        if pendaftaran.berkas_revision["unrevised"] > 0:
+            return JsonResponse({"status": 400, "message": "Masih ada berkas yang belum direvisi"})
         new_status = pendaftaran.next_status()
         status = 200 if new_status else 400
-        return JsonResponse({"status": status, "next_status": new_status})
-    return JsonResponse({"status": -1})
+        return JsonResponse({"status": status, "next_status": new_status, "nilai": nilai})
+    return JsonResponse({"status": -1}, status=400)
 
-def set_nilai(request):
-    if request.method == "POST":
-        id = request.POST.get("id")
-        nilai = request.POST.get("nilai")
-        status = request.POST.get("status")
-        pendaftaran = Pendaftaran.objects.get(id=id)
-        new_nilai = pendaftaran.set_nilai_status(nilai, status)
-        return JsonResponse({"status": 200, "nilai": new_nilai})
-    return JsonResponse({"status": -1})
+def set_nilai(request,id):
+    # id = request.POST.get("id")
+    # status = request.POST.get("status")
+    try:
+        data = json.loads(request.body)
+        if id and data:
+            pendaftaran = Pendaftaran.objects.get(id=id)
+            nilai = pendaftaran.set_nilai_status(data)
+            return JsonResponse({"status": 200, "nilai": nilai})
+    except:
+        pass
+    return JsonResponse({"status": -1}, status=400)
 
-def set_catatan(request):
-    if request.method == "POST":
-        id = request.POST.get("id")
-        catatan = request.POST.get("catatan")
-        status = request.POST.get("status")
-        pendaftaran = Pendaftaran.objects.get(id=id)
-        new_catatan = pendaftaran.set_catatan_status(catatan, status)
-        return JsonResponse({"status": 200, "catatan": new_catatan})
-    return JsonResponse({"status": -1})
+# def set_catatan(request):
+#     id = request.POST.get("id")
+#     catatan = request.POST.get("catatan")
+#     status = request.POST.get("status")
+#     if id and catatan and status:
+#         pendaftaran = Pendaftaran.objects.get(id=id)
+#         new_catatan = pendaftaran.set_catatan_status(catatan, status)
+#         return JsonResponse({"status": 200, "catatan": new_catatan})
+#     return JsonResponse({"status": -1}, status=400)
 
 def delete_pendaftaran(request):
     id = request.POST.get("id")
@@ -99,12 +207,15 @@ def delete_pendaftaran(request):
 def flat_berkas(berkas):
     return {
         "id": berkas.id,
-        "file": berkas.file.url,
+        "file_url": berkas.file.url,
+        "file_name": berkas.file.name,
+        "file_type": extension_to_mime(berkas.file.name.split(".")[-1]),
+        "uploaded_at": berkas.uploaded_at.strftime("%d %b %Y %H:%M"),
         "komentars": [
             {
                 "user": komentar.user.first_name,
                 "content": komentar.content,
-                "created_at": komentar.created_at,
+                "created_at": komentar.created_at.strftime("%d %b %Y %H:%M"),
             }
             for komentar in berkas.komentar_set.all()
         ],
@@ -121,10 +232,12 @@ def get_berkasesList(request):
         for jenis_value,jenis_label in Berkas.jenis_choices:
             item = {
                 "label": jenis_label,
-                "berkases": []
+                "value": jenis_value,
+                "berkases": [],
+                "revision": pendaftaran.jenis_revision(jenis_value),
             }
             try:
-                berkases = pendaftaran.berkas_set.filter(jenis=jenis_value).order_by("uploaded_at")
+                berkases = pendaftaran.berkas_set.filter(jenis=jenis_value).order_by("uploaded_at").reverse()
                 item["berkases"] = [
                     flat_berkas(b)
                     for b in berkases
@@ -139,45 +252,81 @@ def get_berkasesList(request):
 def get_berkases(request):
     id = request.GET.get("id")
     jenis = request.GET.get("jenis")
-    try:
-        pendaftaran = Pendaftaran.objects.get(pk=id)
-        if pendaftaran.user != request.user and not request.user.asisten:
-            return HttpResponseForbidden("Bukan pendaftar")
-        berkases = pendaftaran.berkas_set.filter(jenis=jenis).order_by("uploaded_at")
-        return JsonResponse({"status": 200, "berkases": [flat_berkas(b) for b in berkases]})
-    except Berkas.DoesNotExist:
-        return HttpResponseNotFound("Berkas tidak ada")
+    if id and jenis:
+        try:
+            pendaftaran = Pendaftaran.objects.get(pk=id)
+            if pendaftaran.user != request.user and not request.user.asisten:
+                return HttpResponseForbidden("Bukan pendaftar")
+            berkases = pendaftaran.berkas_set.filter(jenis=jenis).order_by("uploaded_at").reverse()
+            print(berkases)
+            return JsonResponse(
+                {
+                    "status": 200,
+                    "berkas_revision": pendaftaran.berkas_revision,
+                    "revision": pendaftaran.jenis_revision(jenis),
+                    "berkases": [flat_berkas(b) for b in berkases],
+                }
+            )
+        except Berkas.DoesNotExist:
+            return HttpResponseNotFound("Berkas tidak ada")
+    return JsonResponse({"status": -1}, status=400)
 
 def get_berkas(request):
     id = request.GET.get("id")
     try:
         berkas = Berkas.objects.get(pk=id)
-        if berkas.pendaftaran.user != request.user and not request.user.asisten:
+        pendaftaran = berkas.pendaftaran
+        if pendaftaran.user != request.user and not request.user.asisten:
             return HttpResponseForbidden("Bukan pendaftar")
-        return JsonResponse({"status": 200, "berkas": flat_berkas(berkas)})
+        return JsonResponse(
+            {
+                "status": 200,
+                "berkas_revision": pendaftaran.berkas_revision,
+                "revision": pendaftaran.jenis_revision(berkas.jenis),
+                "berkas": flat_berkas(berkas),
+            }
+        )
     except Berkas.DoesNotExist:
-        return HttpResponseNotFound("Berkas tidak ada") 
+        return HttpResponseNotFound("Berkas tidak ada")
+
+def get_pendafataran(request):
+    id = request.GET.get("id")
+    try:
+        pendaftaran = Pendaftaran.objects.get(pk=id)
+        if pendaftaran.user != request.user and not request.user.asisten:
+            return HttpResponseForbidden("Bukan pendaftar")
+        return JsonResponse(
+            {
+                "status": 200,
+                "pendaftaran": pendaftaran.getDict(),
+            }
+        )
+    except Pendaftaran.DoesNotExist:
+        return HttpResponseNotFound("Pendaftaran tidak ada")
 
 def add_berkas(request):
-    if request.method == "POST":
-        id = request.POST.get("id")
+    id = request.POST.get("id")
+    jenis = request.POST.get("jenis")
+    if id and jenis:
         pendaftaran = Pendaftaran.objects.get(pk=id)
         if pendaftaran.user != request.user and not request.user.asisten:
             return HttpResponseForbidden("Bukan pendaftar")
         file = request.FILES["file"]
-        pendaftaran.berkas_set.create(file=file, jenis=request.POST.get("jenis"))
+        pendaftaran.berkas_set.create(file=file, jenis=jenis)
+        pendaftaran.edited_at = datetime.datetime.now()
+        pendaftaran.save()
         return JsonResponse({"status": 200})
-    return JsonResponse({"status": -1})
+    return JsonResponse({"status": -1}, status=400)
 
 def komentar_berkas(request):
-    if request.method == "POST":
-        id = request.POST.get("id")
-        pendaftaran = Pendaftaran.objects.get(pk=id)
+    id = request.POST.get("id")
+    komentar = request.POST.get("komentar")
+    if id and komentar:
+        berkas = Berkas.objects.get(pk=id)
+        pendaftaran = berkas.pendaftaran
         if pendaftaran.user != request.user and not request.user.asisten:
             return HttpResponseForbidden("Bukan pendaftar")
-        berkas_id = request.POST.get("berkas_id")
-        berkas = pendaftaran.berkas_set.get(pk=berkas_id)
-        berkas.komentar_set.create(content=request.POST.get("komentar"), user=request.user)
+        berkas.komentar_set.create(content=komentar, user=request.user)
         berkas.save()
         return JsonResponse({"status": 200})
-    return JsonResponse({"status": -1})
+    return JsonResponse({"status": -1}, status=400)

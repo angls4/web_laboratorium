@@ -10,6 +10,7 @@
   </title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token }}">
   <link rel="stylesheet" href="{% static 'dashboard_asisten.css' %}"> 
 </head>
 
@@ -38,7 +39,7 @@
 </script>
 {% if debug %}
     <!-- Load from Vite dev server during development -->
-    <script type="module" src="http://localhost:5173/src/dashboard-entry.js"></script>
+    <script type="module" src="http://localhost:5173/src/Dashboard-entry.js"></script>
 {% else %}
     <!-- Load the built static file in production -->
     <script type="module" src="{% static 'svelte-js/svelte-table.js' %}"></script>

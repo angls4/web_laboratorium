@@ -2,7 +2,7 @@ import re
 from django import forms
 from django.conf import settings
 
-from .models import Pendaftaran, Persyaratan
+from .models import Berkas, Pendaftaran, Persyaratan, berkas_jenises
 from datetime import date, datetime
 
 class FormPersyaratan(forms.ModelForm):
@@ -63,14 +63,15 @@ class PendaftaranFileInput(forms.ClearableFileInput):
             return value
         return None
 class UploadPendaftaran(forms.ModelForm):
-    berkas = forms.FileField(
-        widget=PendaftaranFileInput(attrs={"id": "id_file", "accept": ".zip,.rar"}),
-        help_text=".zip/.rar",
-        label="File Praktikum",
-    )
+    # berkas = forms.FileField(
+    #     widget=PendaftaranFileInput(attrs={"id": "id_file", "accept": ".zip,.rar"}),
+    #     help_text=".zip/.rar",
+    #     label="File Praktikum",
+    # )
     class Meta:
         model = Pendaftaran
-        fields = ["berkas", "persyaratan", "ipk", "nilai", "linkedin", "instagram","selection_status"]
+        # fields = ["berkas", "persyaratan", "ipk", "nilai", "linkedin", "instagram","selection_status"]
+        fields = ["persyaratan", "ipk", "nilai", "linkedin", "instagram","selection_status"]
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request", None)
@@ -80,6 +81,7 @@ class UploadPendaftaran(forms.ModelForm):
         self.fields['linkedin'].required = True
         self.fields['instagram'].required = True
         self.fields['persyaratan'].label = "Daftar Untuk"
+
         if self.instance and self.instance.pk:
             self.fields['selection_status'].disabled = True
             self.fields["selection_status"].required = False
@@ -87,21 +89,33 @@ class UploadPendaftaran(forms.ModelForm):
             self.fields['persyaratan'].required = False
             # self.fields['praktikum'].disabled = True
             # self.fields['praktikum'].required = False
-            self.fields['berkas'].required = False
+            # self.fields['berkas'].required = False
         else:
+            for jenis in berkas_jenises:
+                self.fields[f'berkas_{jenis[0]}'] = forms.FileField(
+                    widget=PendaftaranFileInput(attrs={"name":f'berkas_{jenis[0]}' ,"id": f"id_{jenis[0]}", "accept": jenis[2]}),
+                    help_text=jenis[2],
+                    label=jenis[1] + (' (opsional)' if not jenis[3] else ''),
+                    required=jenis[3],
+                )
             self.fields.pop('selection_status')
             genap_ganjil_semester = 0 if datetime.now().month < 7 else 1
             self.fields['persyaratan'].queryset = self.fields['persyaratan'].queryset.filter(praktikum__semester__lte=3+genap_ganjil_semester, mulai_daftar__lte=datetime.now().date(), pengumuman__gte=datetime.now().date(), active=True)
             # self.fields['praktikum'].queryset = self.fields['praktikum'].queryset.filter(semester__lte=3+genap_ganjil_semester)
 
-    def clean_berkas(self):
-        file = self.cleaned_data.get("berkas")
-        if not file:
-            return self.instance.berkas
-        return file
+    # def cleanBerkases(self):
+    #     for jenis in berkas_jenises:
+    #         file = self.cleaned_data.get(f'berkas_{jenis[0]}')
+    #         if not file:
+    #             continue
+    #         if not re.match(jenis[2], file.name):
+    #             raise forms.ValidationError(
+    #                 f"File {jenis[1]} harus berformat {jenis[2]}"
+    #             )
 
     def clean(self):
         cleaned_data = super().clean()
+        # self.cleanBerkases()
         persyaratan = cleaned_data.get("persyaratan")
         print(persyaratan)
         print(self.request.user)
@@ -136,21 +150,26 @@ class UploadPendaftaran(forms.ModelForm):
                     raise forms.ValidationError(
                         "User telah mendaftar untuk praktikum ini sebelumnya"
                     )
-        else:
-            raise forms.ValidationError("User atau praktikum tidak ditemukan")
+            else:
+                raise forms.ValidationError("User atau praktikum tidak ditemukan")
 
         return cleaned_data
     def save(self, commit=True, edited=False):
         pendaftaran = super().save(commit=False)
-        if self.files.get("berkas"):
-            current_year = datetime.now().strftime("%Y")
-            pendaftaran.berkas.name = f"{self.request.user.nim}_{pendaftaran.praktikum}_{current_year}"
-        # .{pendaftaran.file.name.split('.')[-1]}
+        # if self.files.get("berkas"):
+        #     current_year = datetime.now().strftime("%Y")
+        #     pendaftaran.berkas.name = f"{self.request.user.nim}_{pendaftaran.praktikum}_{current_year}"
+        # # .{pendaftaran.file.name.split('.')[-1]}
         pendaftaran.user = self.request.user
         if edited:
             pendaftaran.edited_at = datetime.now()
         if commit:
             pendaftaran.save()
+        for jenis in berkas_jenises:
+            file = self.cleaned_data.get(f'berkas_{jenis[0]}')
+            if not file:
+                continue
+            pendaftaran.berkas_set.create(file=file, jenis=jenis[0])
         return pendaftaran
 
 

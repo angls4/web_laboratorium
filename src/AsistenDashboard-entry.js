@@ -1,21 +1,20 @@
-import Dashboard from "./Dashboard.svelte";
+import AsistenDashboard from "./AsistenDashboard.svelte";
 import { mount } from "svelte";
 
 // window.alert("Hello from Svelte!");
 // console.log(window.fullData);
-
-mount(Dashboard, {
+console.log(window.context);
+mount(AsistenDashboard, {
   target: document.getElementById("svelte-table"),
   props: {
     ...window.context,
   },
 });
 
-
 const jsonTesMicroteaching = {
   nilai: 100, // 1-100
   komentar: "Bagus",
-}
+};
 
 const jsonTesPemahaman = {
   pm: 100, // 1-100

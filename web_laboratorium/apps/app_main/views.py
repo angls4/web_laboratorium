@@ -193,7 +193,6 @@ def pendaftaran(request,id=None):
         return render(request, "pendaftaran.html", context)
 
 
-
 # @login_required
 # def dashboard(request):
 #     print(request.user.asisten)
@@ -329,6 +328,7 @@ def pendaftaran(request,id=None):
 #     ]
 #     return render(request, 'dashboard.html', context)
 
+
 @login_required
 def dashboard(request):
     filter_kwargs = {}
@@ -336,38 +336,18 @@ def dashboard(request):
     if request.user.asisten:
         if not request.user.is_superuser:
             filter_kwargs["praktikum"] = request.user.asisten.praktikum
-        pendaftarans = Pendaftaran.objects.filter(**filter_kwargs).order_by(sort_by)
+        pendaftarans = Pendaftaran.objects.filter(**filter_kwargs).order_by(sort_by).reverse()
     else:
-        pendaftarans = Pendaftaran.objects.filter(user=request.user)
+        pendaftarans = Pendaftaran.objects.filter(user=request.user).order_by(sort_by).reverse()
 
-    rows = []
-    for pendaftaran in pendaftarans:
-        rows.append({
-            "id": pendaftaran.id,
-            "nim": pendaftaran.user.nim,
-            "nama": pendaftaran.user.first_name,
-            "linkedin": pendaftaran.linkedin,
-            "instagram": pendaftaran.instagram,
-            "file": pendaftaran.file.url if pendaftaran.file else None,
-            "uploaded_at_int": int(pendaftaran.uploaded_at.timestamp()),
-            "tahun": pendaftaran.uploaded_at.year,
-            "uploaded_at": pendaftaran.uploaded_at.strftime("%Y-%m-%d"),
-            "edited_at": pendaftaran.edited_at.strftime("%Y-%m-%d") if pendaftaran.edited_at else '-',
-            "ipk": str(pendaftaran.ipk),
-            "nilai_id": pendaftaran.nilai,
-            "nilai": pendaftaran.get_nilai_display(),
-            "status_id": pendaftaran.status,
-            "status": pendaftaran.get_selection_status_display(),
-            "berkas_revision": pendaftaran.berkas_revision,
-        })
- 
-    tahun_options = list(range(2018, 2026))
+
+    tahun_options = list(range(2015, datetime.datetime.now().year + 4))
     nilai_options = [{"value": str(choice[0]), "label": choice[1]} for choice in NILAI_CHOICES]
     status_options = [{"value": str(choice[0]), "label": choice[1]} for choice in Pendaftaran.STATUS_CHOICES]
     context = {
         "user": request.user.get_dict(),
         # "debug": True,
-        "rows": rows,
+        "rows": [pendaftaran.getDict() for pendaftaran in pendaftarans],
         "tahun_options": tahun_options,
         "nilai_options": nilai_options,
         "status_options": status_options,
@@ -375,8 +355,6 @@ def dashboard(request):
 
     return render(request, 'dashboard.html', {"debug":True, "context": json.dumps(context)})
 
-
-    
     # return render(request, 'dashboard.html', {"debug":True, "context": json.dumps(context)})
 
 
@@ -404,42 +382,22 @@ def dashboard(request):
 
 @user_passes_test(lambda user: user.is_superuser)
 def asisten(request):
-    periode_filter = request.GET.get('periode') or ''
-    praktikum_filter = request.GET.get('praktikum') or ''
-    sort_by = request.GET.get('sort_by', 'created_at')
-    if not sort_by:
-               sort_by = "created_at"
+    sort_by = "user__first_name"
     order = request.GET.get('order', 'asc')
     if not order:
         order = 'asc'
 
-    rows = Asisten.objects.all()
-    for row in rows:
-        row.nama = row.user.first_name
-        row.nama_praktikum = row.praktikum.praktikum_name
-    reversed_columns = ["nama", "nama_praktikum"]
-    rows = sorted(rows, key=lambda x: x.__dict__[sort_by], reverse=True if order == ('desc' if sort_by not in reversed_columns else 'asc') else False)
-    if periode_filter:
-        rows = list(filter(lambda x: x.periode == periode_filter, rows))
-        print(rows)
-    if praktikum_filter:
-        rows = list(filter(lambda x: x.nama_praktikum == praktikum_filter, rows))
+    asistens = Asisten.objects.order_by(sort_by)
 
-    praktikum_options = Praktikum.objects.all()
-    periode_options = range(2018, 2026)
+    praktikum_options = [{"value": praktikum.id, "label": praktikum.praktikum_name} for praktikum in Praktikum.objects.all()]
+    periode_options = list(range(2015, datetime.datetime.now().year + 4))
 
     context = {
-        "rows": rows,
+        "rows": [asisten.getDict() for asisten in asistens],
         "praktikum_options": praktikum_options,
         "periode_options": periode_options,
     }
-    context["html_string"] = render_to_string("asisten_pdf.html", {
-        "rows": rows,
-        "date": datetime.datetime.now().strftime("%d %B %Y %H:%M"),
-        "periode_filter": periode_filter,
-        "praktikum_filter": praktikum_filter,
-    })
-    return render(request, 'asisten.html', context)
+    return render(request, 'asisten.html', {"debug":True, "context": json.dumps(context)})
 
 @user_passes_test(lambda user: user.koordinator)
 def send_loa(request, pendaftaran_id):

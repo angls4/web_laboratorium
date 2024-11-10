@@ -3,7 +3,7 @@
 import jsPDF from "jspdf";
 
 
-export async function string_to_pdf(htmlString, config = {}) {
+export async function string_to_pdf(htmlString, config = {}, file_name="document.pdf") {
   config = {
     ...{
       orientation: "portrait",
@@ -87,7 +87,7 @@ export async function string_to_pdf(htmlString, config = {}) {
   // Use the container with pdf.html()
   await pdf.html(container, {
     callback: async function (pdf) {
-      pdf.save("document.pdf"); // Save the generated PDF
+      pdf.save(file_name); // Save the generated PDF
 
       // Add back all CSS links
       cssLinks.forEach((link) => document.head.appendChild(link));

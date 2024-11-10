@@ -9,7 +9,7 @@
     </title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <link rel="stylesheet" href="{% static 'asisten.css' %}"> 
+    <link rel="stylesheet" href="{% static 'dashboard_asisten.css' %}">
   </head>
   
   <header>
@@ -20,95 +20,23 @@
     </nav>
   </header>
 
-{% block content %}
   <body>
-    <main>
-      <h2>Selamat datang, {{ user.first_name }}</h2>
-      <form method="get" action="" class="filter">
-        <div class="filter-praktikum">
-          <label for="praktikum">Praktikum:</label>
-          <select name="praktikum" id="praktikum">
-            <option value="">--Pilih Praktikum--</option>
-            {% for praktikum in praktikum_options %}
-              <option value="{{ praktikum }}" {% if request.GET.praktikum == praktikum.praktikum_name %}selected{% endif %}>{{ praktikum }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <div class="filter-periode">
-          <label for="periode">Periode:</label>
-          <select name="periode" id="periode">
-            <option value="">--Pilih Periode--</option>
-            {% for year in periode_options %}
-              <option value="{{ year }}" {% if request.GET.periode == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <input type="hidden" name="sort_by" value="{{ request.GET.sort_by }}">
-        <input type="hidden" name="order" value="{{ request.GET.order }}">
-        <button type="submit">Filter</button>
-      </form>
-      
-      <table class="dashboard-table">
-        <thead>
-          <tr class="head">
-            <th>
-              {% if request.GET.sort_by == "nama" and request.GET.order == "desc" %}
-              <a href="?sort_by=nama&order=asc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Nama &#9660;</a>
-              {% else %}
-              <a href="?sort_by=nama&order=desc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Nama{% if request.GET.sort_by == "nama" %} &#9650{% endif %}</a>
-              {% endif %}
-            </th>
-            
-            <th>
-              {% if request.GET.sort_by == "nama_praktikum" and request.GET.order == "desc" %}
-              <a href="?sort_by=nama_praktikum&order=asc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Asisten &#9660;</a>
-              {% else %}
-              <a href="?sort_by=nama_praktikum&order=desc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Asisten{% if request.GET.sort_by == "nama_praktikum" %} &#9650{% endif %}</a>
-              {% endif %}
-            </th>
-            
-            <th>
-              {% if request.GET.sort_by == "periode" and request.GET.order == "desc" %}
-              <a href="?sort_by=periode&order=asc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Periode &#9660;</a>
-              {% else %}
-              <a href="?sort_by=periode&order=desc&praktikum={{ request.GET.praktikum }}&periode={{ request.GET.periode }}">Periode{% if request.GET.sort_by == "periode" %} &#9650{% endif %}</a>
-              {% endif %}
-            </th> 
-            </tr>
-        </thead>
-        
-        <tbody>
-            {% for row in rows %}
-            <tr>
-              <td>{{row.nama}}</td>
-              <td>{{ row.nama_praktikum }}</td>
-              <td>{{ row.periode }}</td>
-            </tr>
-            {% empty %}
-  
-            <tr>
-              <td colspan="3">
-                Belum ada Asisten.
-              </td>
-            </tr>
-  
-            {% endfor %}
-          </tbody>
-      </table>
-  
-      <a href="http://127.0.0.1:8000/admin/" class="button">Halaman Admin</a>
-      <a class="button" onclick="generatePDF()">Generate PDF</a>
-    </main>
+  {% block content %}
+       <h2 class="judul">Selamat datang, {% if user.asisten %}{{ user.jabatan }} {{ user.praktikum }}{% endif %} {{ user.first_name }}</h2>
+      <div id="svelte-table"></div>
+    {% endblock content %}
   </body>
-  {% endblock content %}
+
   <script src="{% static 'pdf_utils.js' %}"></script>
   <script>
-    htmlString = `
-      {{ html_string }}
-    `;
-    function generatePDF() {
-      string_to_pdf(htmlString);
-    }
+    // svelte
+    window.context = {{ context|safe }};
   </script>
+  {% if debug %}
+      <!-- Load from Vite dev server during development -->
+      <script type="module" src="http://localhost:5173/src/AsistenDashboard-entry.js"></script>
+  {% else %}
+      <!-- Load the built static file in production -->
+      <script type="module" src="{% static 'svelte-js/AsistenDashboard.js' %}"></script>
+  {% endif %}
 </html>
