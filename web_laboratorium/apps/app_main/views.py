@@ -335,7 +335,7 @@ def dashboard(request):
     sort_by = 'uploaded_at'
     if request.user.asisten:
         if not request.user.is_superuser:
-            filter_kwargs["praktikum"] = request.user.asisten.praktikum
+            filter_kwargs["persyaratan__praktikum"] = request.user.asisten.praktikum
         pendaftarans = Pendaftaran.objects.filter(**filter_kwargs).order_by(sort_by).reverse()
     else:
         pendaftarans = Pendaftaran.objects.filter(user=request.user).order_by(sort_by).reverse()
@@ -353,9 +353,7 @@ def dashboard(request):
         "status_options": status_options,
     }
 
-    return render(request, 'dashboard.html', {"debug":True, "context": json.dumps(context)})
-
-    # return render(request, 'dashboard.html', {"debug":True, "context": json.dumps(context)})
+    return render(request, 'dashboard.html', {"debug":settings.DEBUG, "context": json.dumps(context)})
 
 
 # @login_required
@@ -397,7 +395,7 @@ def asisten(request):
         "praktikum_options": praktikum_options,
         "periode_options": periode_options,
     }
-    return render(request, 'asisten.html', {"debug":True, "context": json.dumps(context)})
+    return render(request, 'asisten.html', {"debug":settings.DEBUG, "context": json.dumps(context)})
 
 @user_passes_test(lambda user: user.koordinator)
 def send_loa(request, pendaftaran_id):

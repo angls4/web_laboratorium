@@ -20,7 +20,7 @@ const jsonTesMicroteaching = {
 const jsonTesPemahaman = {
   pm: 100, // 1-100
   km: 100, // 1-100
-  mk: 100, // 1-100
+  pa: 100, // 1-100
   kmp: 100, // 1-100
   sp: 100, // 1-100
   komentar: "Bagus",

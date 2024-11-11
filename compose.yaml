@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    command: gunicorn --bind 0.0.0.0:8000 web_laboratorium.wsgi:application
+    volumes:
+       - .:/app
+        - ./staticfiles_build/static:/app/staticfiles_build  # Ensure static files are available
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    entrypoint: ["/app/entrypoint.sh"]  # Ensure collectstatic runs at container startup
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    volumes:
+      - ./staticfiles_build/static:/usr/share/nginx/html/static  # Mount the static files directory
+    ports:
+      - "80:80"  # Expose Nginx on port 80
+    depends_on:
+      - web  # Ensure Nginx starts after the Django service

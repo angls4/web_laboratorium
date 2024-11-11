@@ -3,6 +3,8 @@
 .history
 .env
 .vercel
+ssh
+staticfiles_build
 django-env
 web_laboratorium.zip
 db.sqlite3

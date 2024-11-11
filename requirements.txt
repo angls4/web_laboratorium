@@ -6,6 +6,7 @@ deprecation==2.1.0
 Django==4.2.11
 django-storages==1.14.4
 fpdf==1.7.2
+gunicorn==23.0.0
 jmespath==1.0.1
 jsonschema==4.23.0
 jsonschema-specifications==2024.10.1

@@ -2,6 +2,7 @@
   import { getPendaftaran, nextStatus, setNilaiStatus } from "./BerkasAPI";
 
     export let isOpen = false;
+    export let user = {};
     let pendaftaran;
     export let rows;
     // let jsonTesMicroteaching; // selection_status 2
@@ -31,7 +32,7 @@
         // jsonWawancaraAsisten = pendaftaran?.nilai_wa; // selection_status 4
         // jsonWawancaraDosen = pendaftaran?.nilai_wd; // selection_status 5
         // inputTesMicroteaching = pendaftaran?.nilai_tm ?? { nilai: 0, komentar: "" }; // selection_status 2
-        // inputTesPemahaman = pendaftaran?.nilai_tp ?? { pm: 0, km: 0, mk: 0, kmp: 0, sp: 0, komentar: "" }; // selection_status 3
+        // inputTesPemahaman = pendaftaran?.nilai_tp ?? { pm: 0, km: 0, pa: 0, kmp: 0, sp: 0, komentar: "" }; // selection_status 3
         // inputWawancaraAsisten = pendaftaran?.nilai_wa ?? { pd: 0, rrd: 0, mdb: 0, komentar: "" }; // selection_status 4
         // inputWawancaraDosen = pendaftaran?.nilai_wd ?? { pd: 0, rrd: 0, mdb: 0, komentar: "" }; // selection_status 5
         
@@ -44,7 +45,7 @@
         inputTesPemahaman = {
             pm: pendaftaran?.nilai_tp?.pm ?? 0,
             km: pendaftaran?.nilai_tp?.km ?? 0,
-            mk: pendaftaran?.nilai_tp?.mk ?? 0,
+            pa: pendaftaran?.nilai_tp?.pa ?? 0,
             kmp: pendaftaran?.nilai_tp?.kmp ?? 0,
             sp: pendaftaran?.nilai_tp?.sp ?? 0,
             komentar: pendaftaran?.nilai_tp?.komentar ?? ""
@@ -103,7 +104,7 @@
             if (res && res.status == 200) {
                 alert('Berhasil menyimpan data');
                 const newPendaftaran = await getPendaftaran(pendaftaran.id);
-                rows[rows.indexOf(pendaftaran)] = newPendaftaran.pendaftaran;
+                rows[rows.findIndex(row=>row.id==pendaftaran.id)] = newPendaftaran.pendaftaran;
                 changePendaftaran(newPendaftaran.pendaftaran);
                 // closeModal();
             } else {
@@ -124,7 +125,7 @@
             if (res && res.status == 200) {
                 alert('Berhasil melanjutkan ke status berikutnya');
                 const newPendaftaran = await getPendaftaran(pendaftaran.id);
-                rows[rows.indexOf(pendaftaran)] = newPendaftaran.pendaftaran;
+                rows[rows.findIndex(row=>row.id==pendaftaran.id)] = newPendaftaran.pendaftaran;
                 changePendaftaran(newPendaftaran.pendaftaran);
                 // closeModal();
             } else {
@@ -162,6 +163,10 @@
                                 <p>PERLU DIISI</p>
                             {/if}
                         </div>
+                    {:else}
+                    <div>
+                        Belum ada penilaian
+                    </div>
                     {/if}
                     {#if pendaftaran?.nilai_tp || selection_status === 3}
                         <div class="jenis-chip {selectedStatus === 3 ? 'selected' : ''}" on:click={() => selectStatus(3)}>
@@ -190,56 +195,80 @@
                 </div>
                 <div class="content-container">
                     {#if selectedStatus === 2}
-                        <h2>Tes Microteaching</h2>
-                        <label>Nilai: <input type="number" min="1" max="100" bind:value={inputTesMicroteaching.nilai} readonly={selection_status !== 2} on:input={(e) => handleInputChange(e, 'nilai', 'microteaching')} /></label>
-                        <label>Komentar: <textarea bind:value={inputTesMicroteaching.komentar} readonly={selection_status !== 2} on:input={(e) => handleInputChange(e, 'komentar', 'microteaching')}></textarea></label>
-                        {#if selection_status === 2}
+                        <!-- <h2>Tes Microteaching</h2> -->
+                        <label></label>
+                        <label>(nilai 1-100)</label>
+                        <label>Nilai: <input type="number" min="1" max="100" bind:value={inputTesMicroteaching.nilai} readonly={!user.is_superuser || selection_status !== 2} on:input={(e) => handleInputChange(e, 'nilai', 'microteaching')} /></label>
+                        <label>Komentar: <textarea bind:value={inputTesMicroteaching.komentar} readonly={!user.is_superuser || selection_status !== 2} on:input={(e) => handleInputChange(e, 'komentar', 'microteaching')}></textarea></label>
+                        {#if user.koordinator && selection_status === 2}
                         <div>
                             <button on:click={handleSimpan}>Simpan</button>
                             <button on:click={handleLanjut}>Lanjut</button>
+                        </div>
+                        {:else}
+                        <div>
+                            (diisi oleh koordinator asisten)
                         </div>
                         {/if}
                     {/if}
 
                     {#if selectedStatus === 3}
-                        <h2>Tes Pemahaman</h2>
-                        <label>PM: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.pm} readonly={selection_status !== 3} on:input={(e) => handleInputChange(e, 'pm', 'pemahaman')} /></label>
-                        <label>KM: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.km} readonly={selection_status !== 3} on:input={(e) => handleInputChange(e, 'km', 'pemahaman')} /></label>
-                        <label>MK: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.mk} readonly={selection_status !== 3} on:input={(e) => handleInputChange(e, 'mk', 'pemahaman')} /></label>
-                        <label>KMP: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.kmp} readonly={selection_status !== 3} on:input={(e) => handleInputChange(e, 'kmp', 'pemahaman')} /></label>
-                        <label>SP: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.sp} readonly={selection_status !== 3} on:input={(e) => handleInputChange(e, 'sp', 'pemahaman')} /></label>
-                        <label>Komentar: <textarea bind:value={inputTesPemahaman.komentar} readonly={selection_status !== 3} on:input={(e) => handleInputChange(e, 'komentar', 'pemahaman')}></textarea></label>
-                        {#if selection_status === 3}
+                        <!-- <h2>Tes Pemahaman</h2> -->
+                        <label></label>
+                        <label>(nilai 1-100)</label>
+                        <label>Penguasaan Materi: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.pm} readonly={!user.is_superuser || selection_status !== 3} on:input={(e) => handleInputChange(e, 'pm', 'pemahaman')} /></label>
+                        <label>Kemampuan Menjelaskan: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.km} readonly={!user.is_superuser || selection_status !== 3} on:input={(e) => handleInputChange(e, 'km', 'pemahaman')} /></label>
+                        <label>Penguasaan Audience: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.pa} readonly={!user.is_superuser || selection_status !== 3} on:input={(e) => handleInputChange(e, 'pa', 'pemahaman')} /></label>
+                        <label>Kemampuan Menjawab Pertanyaan: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.kmp} readonly={!user.is_superuser || selection_status !== 3} on:input={(e) => handleInputChange(e, 'kmp', 'pemahaman')} /></label>
+                        <label>Sikap Presentasi: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.sp} readonly={!user.is_superuser || selection_status !== 3} on:input={(e) => handleInputChange(e, 'sp', 'pemahaman')} /></label>
+                        <label>Komentar: <textarea bind:value={inputTesPemahaman.komentar} readonly={!user.is_superuser || selection_status !== 3} on:input={(e) => handleInputChange(e, 'komentar', 'pemahaman')}></textarea></label>
+                        {#if user.koordinator && selection_status === 3}
                         <div>
                             <button on:click={handleSimpan}>Simpan</button>
                             <button on:click={handleLanjut}>Lanjut</button>
+                        </div>
+                        {:else}
+                        <div>
+                            (diisi oleh koordinator asisten)
                         </div>
                         {/if}
                     {/if}
 
                     {#if selectedStatus === 4}
-                        <h2>Wawancara Asisten</h2>
-                        <label>PD: <input type="number" min="1" max="5" bind:value={inputWawancaraAsisten.pd} readonly={selection_status !== 4} on:input={(e) => handleInputChange(e, 'pd', 'wawancaraAsisten')} /></label>
-                        <label>RRD: <input type="number" min="1" max="5" bind:value={inputWawancaraAsisten.rrd} readonly={selection_status !== 4} on:input={(e) => handleInputChange(e, 'rrd', 'wawancaraAsisten')} /></label>
-                        <label>MDB: <input type="number" min="1" max="5" bind:value={inputWawancaraAsisten.mdb} readonly={selection_status !== 4} on:input={(e) => handleInputChange(e, 'mdb', 'wawancaraAsisten')} /></label>
-                        <label>Komentar: <textarea bind:value={inputWawancaraAsisten.komentar} readonly={selection_status !== 4} on:input={(e) => handleInputChange(e, 'komentar', 'wawancaraAsisten')}></textarea></label>
-                        {#if selection_status === 4}
+                        <!-- <h2>Wawancara Asisten</h2> -->
+                        <label></label>
+                        <label>(nilai 1-5)</label>
+                        <label>Pengenalan Diri: <input type="number" min="1" max="5" bind:value={inputWawancaraAsisten.pd} readonly={!user.is_superuser || selection_status !== 4} on:input={(e) => handleInputChange(e, 'pd', 'wawancaraAsisten')} /></label>
+                        <label>Rencana dan Rancangan ke Depan: <input type="number" min="1" max="5" bind:value={inputWawancaraAsisten.rrd} readonly={!user.is_superuser || selection_status !== 4} on:input={(e) => handleInputChange(e, 'rrd', 'wawancaraAsisten')} /></label>
+                        <label>Motivasi dalam Bekerja: <input type="number" min="1" max="5" bind:value={inputWawancaraAsisten.mdb} readonly={!user.is_superuser || selection_status !== 4} on:input={(e) => handleInputChange(e, 'mdb', 'wawancaraAsisten')} /></label>
+                        <label>Komentar: <textarea bind:value={inputWawancaraAsisten.komentar} readonly={!user.is_superuser || selection_status !== 4} on:input={(e) => handleInputChange(e, 'komentar', 'wawancaraAsisten')}></textarea></label>
+                        {#if user.koordinator && selection_status === 4}
                         <div>
                             <button on:click={handleSimpan}>Simpan</button>
                             <button on:click={handleLanjut}>Lanjut</button>
                         </div>
+                        {:else}
+                        <div>
+                            (diisi oleh koordinator asisten)
+                        </div>
                         {/if}
                     {/if}
                     {#if selectedStatus === 5}
-                        <h2>Wawancara Dosen</h2>
-                        <label>PD: <input type="number" min="1" max="5" bind:value={inputWawancaraDosen.pd} readonly={selection_status !== 5} on:input={(e) => handleInputChange(e, 'pd', 'wawancaraDosen')} /></label>
-                        <label>RRD: <input type="number" min="1" max="5" bind:value={inputWawancaraDosen.rrd} readonly={selection_status !== 5} on:input={(e) => handleInputChange(e, 'rrd', 'wawancaraDosen')} /></label>
-                        <label>MDB: <input type="number" min="1" max="5" bind:value={inputWawancaraDosen.mdb} readonly={selection_status !== 5} on:input={(e) => handleInputChange(e, 'mdb', 'wawancaraDosen')} /></label>
-                        <label>Komentar: <textarea bind:value={inputWawancaraDosen.komentar} readonly={selection_status !== 5} on:input={(e) => handleInputChange(e, 'komentar', 'wawancaraDosen')}></textarea></label>
-                        {#if selection_status === 5}
+                        <!-- <h2>Wawancara Dosen</h2> -->
+                        <label></label>
+                        <label>(nilai 1-5)</label>
+                        <label>Pengenalan Diri: <input type="number" min="1" max="5" bind:value={inputWawancaraDosen.pd} readonly={!user.is_superuser || selection_status !== 5} on:input={(e) => handleInputChange(e, 'pd', 'wawancaraDosen')} /></label>
+                        <label>Rencana dan Rancangan ke Depan: <input type="number" min="1" max="5" bind:value={inputWawancaraDosen.rrd} readonly={!user.is_superuser || selection_status !== 5} on:input={(e) => handleInputChange(e, 'rrd', 'wawancaraDosen')} /></label>
+                        <label>Motivasi dalam Bekerja: <input type="number" min="1" max="5" bind:value={inputWawancaraDosen.mdb} readonly={!user.is_superuser || selection_status !== 5} on:input={(e) => handleInputChange(e, 'mdb', 'wawancaraDosen')} /></label>
+                        <label>Komentar: <textarea bind:value={inputWawancaraDosen.komentar} readonly={!user.is_superuser || selection_status !== 5} on:input={(e) => handleInputChange(e, 'komentar', 'wawancaraDosen')}></textarea></label>
+                        {#if user.koordinator && selection_status === 5}
                         <div>
                             <button on:click={handleSimpan}>Simpan</button>
                             <button on:click={handleLanjut}>Lanjut</button>
+                        </div>
+                        {:else}
+                        <div>
+                            (diisi oleh dosen yang bersangkuktan)
                         </div>
                         {/if}
                     {/if}

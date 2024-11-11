@@ -56,6 +56,14 @@ class Praktikum(models.Model):
 
     def __str__(self):
         return self.praktikum_name
+    
+    def getDict(self):
+        return {
+            "id": self.id,
+            "nama   ": self.praktikum_name,
+            "semester": self.semester,
+            "matkul": self.matkul.nama_matkul,
+        }
 
 class Asisten(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -86,7 +94,7 @@ class Asisten(models.Model):
         return f"{nim} {self.user.first_name} ({self.praktikum.praktikum_name} - {self.divisi})"
         # if self.asistensi:
         #     return f"{nim} {self.user.first_name} {self.praktikum.praktikum_name} {self.asistensi.asistensi_name}"
-
+    
     def getDict(self):
         return {
             "nim": self.user.email.split("@")[0],
@@ -135,13 +143,13 @@ tes_pemahaman_schema = {
     "properties": {
         "pm": {"type": "integer", "minimum": 1, "maximum": 100},
         "km": {"type": "integer", "minimum": 1, "maximum": 100},
-        "mk": {"type": "integer", "minimum": 1, "maximum": 100},
+        "pa": {"type": "integer", "minimum": 1, "maximum": 100},
         "kmp": {"type": "integer", "minimum": 1, "maximum": 100},
         "sp": {"type": "integer", "minimum": 1, "maximum": 100},
         "komentar": {"type": "string"},
     },
     "additionalProperties": False,
-    "required": ["pm", "km", "mk", "kmp", "sp", "komentar"],
+    "required": ["pm", "km", "pa", "kmp", "sp", "komentar"],
 }
 
 wawancara_schema = {
@@ -214,6 +222,7 @@ class Pendaftaran(models.Model):
     def getDict(self):
         return {
             "id": self.id,
+            "user_id": self.user.id,
             "nim": self.user.nim,
             "nama": self.user.first_name,
             "linkedin": self.linkedin,
@@ -227,6 +236,7 @@ class Pendaftaran(models.Model):
                 else "-"
             ),
             "ipk": str(self.ipk),
+            "praktikum": self.praktikum.praktikum_name,
             "nilai_id": self.nilai,
             "nilai": self.get_nilai_display(),
             "status_id": self.status,
@@ -264,13 +274,11 @@ class Pendaftaran(models.Model):
 
     def jenis_revision(self, jenis):
         revision = 0
-        print(jenis )
         try:
             rows = self.berkas_set.filter(jenis=jenis).all().order_by("uploaded_at").reverse()
             i = 0
             inc = 1
             while i < len(rows):
-                print(rows[i].__dict__, rows[i].komentar_set.exists())
                 if rows[i].komentar_set.exists():
                     revision = 1
                     inc = -1
@@ -278,30 +286,9 @@ class Pendaftaran(models.Model):
                     revision = 2
                     break
                 i += inc
-            # print(revised, unrevised)
-
-            # try:
-            #     if last_two[1].komentar_set.exists():
-            #         unrevised = 1
-            # except:
-            #     pass
-            # try:
-            #     revisi = self.berkas_set.filter(jenis=jenis).all().order_by("uploaded_at").reverse().filter(komentar_set__isnull=True)[0]
-            #     if lrevisi:
-            #         unrevised = 1
-            #     else:
-            #         if unrevised > 0:
-            #             revised = 1
-            #             unrevised = 0
-            # except:
-            #     if unrevised > 0:
-            #         revised = 1
-            #         unrevised = 0
-            # print(revised, unrevised)
         except Exception as e:
             print(e)
         # revision = 2 if revised == 1 else 1 if unrevised == 1 else 0
-        print("revision",revision)
         return revision
 
     def nilai_status(self,status=None):
@@ -405,9 +392,10 @@ class Berkas(models.Model):
     jenis = models.CharField(max_length=2, choices=jenis_choices)
 
     def save(self, *args, **kwargs):
-        current_year = datetime.now().year
-        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-        self.file.name = f"{self.pendaftaran.user.nim}_{self.pendaftaran.praktikum.praktikum_name}_{current_year}_{timestamp}{self.file.name[self.file.name.rfind('.'):]}"
+        if not self.pk:  # Only if the file is new
+            current_year = datetime.now().year
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            self.file.name = f"{self.pendaftaran.user.nim}_{self.pendaftaran.praktikum.praktikum_name}_{current_year}_{timestamp}{self.file.name[self.file.name.rfind('.'):]}"
         super().save(*args, **kwargs)
     # def asisten(self):
     # return self.file.name

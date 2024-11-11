@@ -130,7 +130,7 @@
             if (res && res.status == 200) {
                 alert('Berhasil melanjutkan ke status berikutnya');
                 const newPendaftaran = await getPendaftaran(pendaftaran.id);
-                rows[rows.indexOf(pendaftaran)] = newPendaftaran.pendaftaran;
+                rows[rows.findIndex(row=>row.id==pendaftaran.id)] = newPendaftaran.pendaftaran;
             } else {
                 alert('Gagal melanjutkan ke status berikutnya');
             }
@@ -161,12 +161,12 @@
     }
 
 </script>
-<BerkasModal bind:rows={rows} bind:ticker={ticker} bind:this={berkasModal} bind:pendaftaran={selectedPendaftaran} bind:berkasesList={selectedBerkasesList}>
+<BerkasModal bind:rows={rows} bind:user={user} bind:ticker={ticker} bind:this={berkasModal} bind:pendaftaran={selectedPendaftaran} bind:berkasesList={selectedBerkasesList}>
     <div slot="header">
         <h1>Berkas-Berkas Pendaftaran</h1>
     </div>
 </BerkasModal>
-<ModalPenilaian bind:this={penilaianModal} bind:rows={rows}></ModalPenilaian>
+<ModalPenilaian bind:user={user} bind:this={penilaianModal} bind:rows={rows}></ModalPenilaian>
 
 
 <div class="filter">
@@ -322,10 +322,16 @@
                     <p>{row.status}</p>
                     <p>
                         {#if row.status_id == 1}
-                            {#if row.berkas_revision.unrevised == 0}
-                                <button on:click={()=>handleLanjut(row)}>Ke Tahap Berikutnya</button>
+                            {#if user.koordinator}
+                                {#if row.berkas_revision.unrevised == 0}
+                                    <button on:click={()=>handleLanjut(row)}>Ke Tahap Berikutnya</button>
+                                {:else}
+                                    <button on:click={()=>openBerkasModal(row)}>Berkas Perlu Direvisi</button>
+                                {/if}
                             {:else}
-                                <button on:click={()=>openBerkasModal(row)}>Berkas Perlu Direvisi</button>
+                                {#if row.berkas_revision.unrevised > 0}
+                                    <p style="margin-top: 5px; font-style:italic">(Berkas Perlu Direvisi)</p>
+                                {/if}
                             {/if}
                         {:else}
                             <button on:click={()=>openPenilaianModal(row)}>
@@ -346,7 +352,7 @@
                 {#if user.jabatan !== 'Asisten'}
                     <td>
                         <p>
-                            <a href={`/pendaftaran/${row.id}`} target="_blank"><button>Edit</button></a>
+                            <a href={`/pendaftaran/${row.id}`}><button>Edit</button></a>
                             {#if user.koordinator}
                                 <a on:click={()=>handleDelete(row)}><button>Delete</button></a>
                                 

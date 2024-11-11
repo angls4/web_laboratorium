@@ -150,8 +150,8 @@ class UploadPendaftaran(forms.ModelForm):
                     raise forms.ValidationError(
                         "User telah mendaftar untuk praktikum ini sebelumnya"
                     )
-            else:
-                raise forms.ValidationError("User atau praktikum tidak ditemukan")
+        else:
+            raise forms.ValidationError("User atau praktikum tidak ditemukan")
 
         return cleaned_data
     def save(self, commit=True, edited=False):

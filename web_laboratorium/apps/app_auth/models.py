@@ -10,6 +10,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext_lazy as _
 
+# from web_laboratorium.apps.app_main.models import Asisten
+
 
 class CustomUMSStudentEmailValidator(RegexValidator):
     regex = r"^[a-zA-Z]\d{9}@student\.ums\.ac\.id$"
@@ -35,7 +37,7 @@ class UMSUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("The Email field must be set")
-        email = self.normalize_email(   email)
+        email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -82,22 +84,26 @@ class UMSUser(AbstractBaseUser, PermissionsMixin):
 
     @property
     def koordinator(self):
+        current_year = f'{(datetime.datetime.now().year)}'
         if self.is_superuser:
             return "Admin"
-        current_year = f'{(datetime.datetime.now().year)}'
         try:
             return self.asisten_set.get(divisi="Koordinator", periode=current_year).praktikum
+            return True
         except:
             return None
         return self.asisten_set.filter(divisi="Koordinator", periode=current_year).first().praktikum
 
     @property
     def asisten(self):
-        if self.is_superuser:
-            return True
         current_year = f'{(datetime.datetime.now().year)}'
+        if self.is_superuser:
+            if self.asisten_set.exists():
+                return self.asisten_set.get(periode=current_year)
+            return "Admin"
         try:
             return self.asisten_set.get(periode=current_year)
+            # return True;
         except:
             return None
 
@@ -110,7 +116,7 @@ class UMSUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.nim} {self.first_name}"
-    
+
     @property
     def jabatan(self):
         if self.is_superuser:
@@ -130,9 +136,10 @@ class UMSUser(AbstractBaseUser, PermissionsMixin):
             "is_staff": self.is_staff,
             "is_verified": self.is_active,
             "is_superuser": self.is_superuser,
-            "asisten": self.asisten,
+            "asisten": self.asisten.getDict() if self.asisten and self.asisten != "Admin" else self.asisten if self.asisten else None,
+            # "asissten": self.asisten,
             "koordinator": self.koordinator,
-            "praktikum": self.praktikum,
+            "praktikum": self.praktikum.getDict() if self.praktikum else None,
             "nim": self.nim,
             "angkatan": self.angkatan,
             "jabatan": self.jabatan,

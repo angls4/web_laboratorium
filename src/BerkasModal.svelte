@@ -7,6 +7,7 @@
     export let berkasesList = [];
     export let ticker = 1;
     export let rows = [];
+    export let user = {};
 
     let selectedJenis;
     let selectedBerkases;
@@ -68,8 +69,8 @@
                     berkasesList[berkasesList.indexOf(selectedBerkases)].berkases = newBerkases.berkases
                     changeBerkas(selectedBerkases.berkases[0]);
                     const newPendaftaran = await getPendaftaran(pendaftaran.id);
-                    rows[rows.indexOf(pendaftaran)] = newPendaftaran.pendaftaran;
-                    // rows[rows.indexOf(pendaftaran)].berkas_revision = newBerkases.berkas_revision
+                    rows[rows.findIndex(row=>row.id==pendaftaran.id)] = newPendaftaran.pendaftaran;
+                    console.log("revised rows",rows)
                 } else {
                     alert('Failed to add berkas');
                 }
@@ -104,8 +105,7 @@
                     berkasesList[berkasesList.indexOf(selectedBerkases)].revision = newBerkas.revision
                     console.log(newBerkas)
                     const newPendaftaran = await getPendaftaran(pendaftaran.id);
-                    rows[rows.indexOf(pendaftaran)] = newPendaftaran.pendaftaran;
-                    // rows[rows.indexOf(pendaftaran)].berkas_revision = newBerkas.berkas_revision
+                    rows[rows.findIndex(row=>row.id==pendaftaran.id)] = newPendaftaran.pendaftaran;
                 } else {
                     alert('Failed to add komentar');
                 }
@@ -153,11 +153,13 @@
                 </div>
                 <div class="berkas-container">
                     {#if selectedBerkases}
+                    {#if user.id == pendaftaran.user_id || user.is_superuser}
                     <div class="add-berkas">
-                        <label for="fileInput" class="file-label">Tambah Berkas</label>
+                        <label for="fileInput" class="file-label">Upload Berkas</label>
                         <input hidden type="file" accept=".pdf, .jpg, .jpeg, .png, .webp" id="fileInput" on:change={handleFileChange} class="file-input" />
                         <!-- <button on:click={handleAddBerkas} class="add-berkas-button">Add Berkas</button> -->
                     </div>
+                    {/if}
                         {#if selectedBerkas}
                         
                             <div class="berkas-navigation">
@@ -191,10 +193,12 @@
                             {/if}
                             {/await}
                             <ImageViewer fileType={selectedBerkas.file_type} fileUrl={selectedBerkas.file_url} fileName={selectedBerkas.file_name} />
+                            {#if user.koordinator}
                             <div class="revisi-container">
-                                <textarea height="100px" bind:value={newKomentar} placeholder="Add your komentar here..."></textarea>
-                                <button on:click={handleAddKomentar}>Add Komentar</button>
+                                <textarea height="100px" bind:value={newKomentar} placeholder="Tambahkan revisi atau komentar disini..."></textarea>
+                                <button on:click={handleAddKomentar}>Tambah Revisi</button>
                             </div>
+                            {/if}
                         </div>
                         {:else}
                         <p>Berkas tidak ada</p>

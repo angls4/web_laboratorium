@@ -6,9 +6,18 @@ import path from "path";
 export default defineConfig({
   plugins: [svelte()],
   build: {
-    outDir: path.resolve(__dirname, "static/svelte-js"), // Adjust path to your Django app's static folder
+    outDir: path.resolve(__dirname, "staticfiles_build/static/svelte-js"), // Adjust path to your Django app's static folder
     rollupOptions: {
-      input: "./src/svelte-entry.js",
+      input: {
+        Dashboard: "./src/Dashboard-entry.js",
+        AsistenDashboard: "./src/AsistenDashboard-entry.js",
+      },
+      output: {
+        entryFileNames: "[name].js",
+        chunkFileNames: "[name]-[hash].js",
+        assetFileNames: "[name][extname]",
+      },
+      emptyOutDir: true,
     },
     watch: {
       usePolling: true, // Forces Vite to poll for changes (useful for certain environments)
