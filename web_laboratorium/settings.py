@@ -116,7 +116,7 @@ else:
             "HOST": os.getenv("DB_HOST"),
             "PORT": os.getenv("DB_PORT", "5432"),
             "OPTIONS": {
-                "sslmode": "require",
+                "sslmode": os.getenv('disabled') ,
             },
         }
     }
@@ -179,7 +179,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
     # os.path.join(BASE_DIR, "staticfiles_build", "static"),
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build", "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

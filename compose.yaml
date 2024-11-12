@@ -1,16 +1,44 @@
 version: '3'
 
 services:
-  web:
-    build: .
-    command: gunicorn --bind 0.0.0.0:8000 web_laboratorium.wsgi:application
+  database:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: web_laboratorium
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_SSLMODE: require
+      POSTGRES_SSLROOTCERT: /path/to/root.crt
     volumes:
-      - staticfiles:/app/staticfiles_build/static  # Named volume for static files
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - webnet
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    volumes:
+      - staticfiles:/app/staticfiles
+    # command: npm run build
+    # entrypoint: ["/entrypoint.sh"]
+
+  backend:
+    build: .
+    # command: gunicorn --bind 0.0.0.0:8000 web_laboratorium.wsgi:application
+    volumes:
+      - staticfiles:/app/staticfiles  # Named volume for static files
     ports:
       - "8000:8000"
     env_file:
       - .env
-    entrypoint: ["/app/entrypoint.sh"]
+    
+    # entrypoint: ["/app/entrypoint.sh"]
+    depends_on:
+      - frontend
+      - database
+    networks:
+      - webnet
 
   nginx:
     build:
@@ -26,8 +54,20 @@ services:
       - "80:80"      # Expose HTTP on port 80 for ACME challenges and redirects
       - "443:443"    # Expose HTTPS on port 443 for secure connections
     depends_on:
-      - web
+      - backend
+    networks:
+      - webnet
 
 
 volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /root/postgres_data
+      o: bind
+  
   staticfiles:
+
+networks:
+  webnet:

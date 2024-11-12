@@ -6,7 +6,7 @@ import path from "path";
 export default defineConfig({
   plugins: [svelte()],
   build: {
-    outDir: path.resolve(__dirname, "staticfiles_build/static/svelte-js"), // Adjust path to your Django app's static folder
+    outDir: path.resolve(__dirname, "staticfiles/svelte-js"), // Adjust path to your Django app's static folder
     rollupOptions: {
       input: {
         Dashboard: "./src/Dashboard-entry.js",
@@ -19,9 +19,7 @@ export default defineConfig({
       },
       emptyOutDir: true,
     },
-    watch: {
-      usePolling: true, // Forces Vite to poll for changes (useful for certain environments)
-    },
+    watch: false
   },
   resolve: {
     alias: {
