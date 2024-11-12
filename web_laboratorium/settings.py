@@ -30,13 +30,19 @@ SECRET_KEY = 'django-insecure-y6n8u_7*_#$&!peeg&088p4c1milhh)+61n7rh@p2k6=65e(+y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ["127.0.0.1", ".vercel.app", "localhost"]
+_http_site_url = os.getenv("SITE_URL", "localhost")
+_site_url = _http_site_url.split('//')[1]
+_protocol = _http_site_url.split('//')[0]+"//"
+
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", _site_url, "wwww."+_site_url]
+
+print(ALLOWED_HOSTS)
 
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://localhost:5173",
-    "http://localhost:8000",
-    os.getenv("SITE_URL", "http://localhost:8000"),
+    _http_site_url,
+    _protocol+"wwww."+_http_site_url
 ]
 
 
@@ -171,7 +177,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
-    os.path.join(BASE_DIR, "staticfilees_build", "static"),
+    # os.path.join(BASE_DIR, "staticfiles_build", "static"),
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build", "static")
 # Default primary key field type
@@ -179,7 +185,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build", "static")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SITE_URL = os.getenv("SITE_URL", "http://localhost:8000/")
+SITE_URL = _http_site_url
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -207,7 +213,7 @@ def password_change_callback(user, password):
 # Global Package Settings
 EMAIL_DESTINATION = os.getenv("EMAIL_DESTINATION", "")  # empty to not force all email to go to this address
 EMAIL_FROM_ADDRESS = os.getenv("EMAIL_FROM_ADDRESS", "")  # mandatory
-EMAIL_PAGE_DOMAIN = os.getenv("SITE_URL", "http://localhost:8000/")  # mandatory (unless you use a custom link)
+EMAIL_PAGE_DOMAIN = _http_site_url  # mandatory (unless you use a custom link)
 EMAIL_MULTI_USER = False  # optional (defaults to False)
 
 # Email Verification Settings (mandatory for email sending)

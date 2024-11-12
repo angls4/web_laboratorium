@@ -25,6 +25,7 @@ COPY . /app/
 # Collect static files during the image build
 RUN python manage.py collectstatic --noinput
 
+COPY staticfiles_build/static/svelte-js /app/staticfiles_build/static/svelte-js
 # Expose the port the app runs on
 EXPOSE 8000
 

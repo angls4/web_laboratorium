@@ -1,6 +1,6 @@
 <script>
     import ImageViewer from './ImageViewer.svelte';
-    import { addBerkas, getBerkas, getBerkases, getPendaftaran, komentarBerkas } from './BerkasApi';
+    import { addBerkas, getBerkas, getBerkases, getPendaftaran, komentarBerkas } from '@/beerkasApi';
 
     export let isOpen = false;
     export let pendaftaran = {};

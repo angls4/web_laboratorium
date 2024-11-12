@@ -3,7 +3,7 @@
     import {string_to_pdf} from './pdf-utils'
     import BerkasModal from './BerkasModal.svelte';
     import axios from 'axios';
-    import {deletePendaftaran, getBerkasesList, getPendaftaran, nextStatus} from './BerkasAPI';
+    import {deletePendaftaran, getBerkasesList, getPendaftaran, nextStatus} from '@/beerkasApi';
   import ModalPenilaian from './ModalPenilaian.svelte';
 
     let berkasModal;

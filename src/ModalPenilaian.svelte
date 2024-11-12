@@ -1,5 +1,5 @@
 <script>
-  import { getPendaftaran, nextStatus, setNilaiStatus } from "./BerkasAPI";
+  import { getPendaftaran, nextStatus, setNilaiStatus } from "@/beerkasApi";
 
     export let isOpen = false;
     export let user = {};
