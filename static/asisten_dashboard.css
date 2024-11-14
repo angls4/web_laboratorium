@@ -1,45 +1,126 @@
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure, 
-footer, header, hgroup, menu, nav, section {
-	display: block;
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
 }
 body {
-	line-height: 1;
+  line-height: 1;
 }
-ol, ul {
-	list-style: none;
+ol,
+ul {
+  list-style: none;
 }
-blockquote, q {
-	quotes: none;
+blockquote,
+q {
+  quotes: none;
 }
-blockquote:before, blockquote:after,
-q:before, q:after {
-	content: '';
-	content: none;
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: "";
+  content: none;
 }
 table {
-	border-collapse: collapse;
-	border-spacing: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 
 :root {
@@ -47,25 +128,25 @@ table {
   --dark: #2b2928;
   --blue: #1c3b68;
   --light-blue: #4d8dc1;
-	--primary-font:   "Poppins", serif;
-	--secondary-font: "Noticia Text", serif;
-	--tertiary-font: "Lora", serif;
+  --primary-font: "Poppins", serif;
+  --secondary-font: "Noticia Text", serif;
+  --tertiary-font: "Lora", serif;
 }
 
-html{
+html {
   background-color: var(--white);
 }
 
-.nav-menu{
-	display: flex;
-	flex-direction: row;
-	font-family: var(--primary-font);
-	column-gap: 15px;
+.nav-menu {
+  display: flex;
+  flex-direction: row;
+  font-family: var(--primary-font);
+  column-gap: 15px;
 }
 
 .nav-menu a {
-	text-decoration: none;
-	color: black;
+  text-decoration: none;
+  color: black;
 }
 
 .nav-menu a {
@@ -84,22 +165,21 @@ html{
 }
 
 .filter {
-  margin: 100px 0 20px 0;
+  margin-top: 50px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
-  justify-content: center;
-  column-gap: 20px;
+  justify-content: space-evenly;
+  width: 100%;
 }
 
-.filter label{
-  font-size: 24px;
+.filter label {
+  font-size: 20px;
   font-family: var(--primary-font);
-  margin-right: 10px;
   padding: 5px 10px;
 }
 
-.filter select{
+.filter select {
   padding: 5px 10px;
   text-align: center;
   font-size: 14px;
@@ -109,17 +189,18 @@ html{
   border: 2px solid black;
 }
 
-.filter button{
+.filter button {
+  width: 150px;
   font-size: 16px;
   margin-top: 0px;
   font-family: var(--primary-font);
-  padding: 5px 50px;
+  padding: 5px 0;
   border-radius: 25px;
   border-color: transparent;
   background-color: var(--dark);
   color: white;
 }
-.filter input{
+.filter input {
   padding: 5px 10px;
   /* text-align: center; */
   font-size: 14px;
@@ -129,26 +210,26 @@ html{
   border: 2px solid black;
 }
 
-nav{
-	padding: 20px 50px;
+nav {
+  padding: 20px 50px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-	align-items: center;
+  align-items: center;
 }
 
-nav img{
+nav img {
   height: 120px;
-	position: relative;
-	left: 80px;
+  position: relative;
+  left: 80px;
 }
 
-nav h1{
-	font-family: var(--secondary-font);
-	font-size: 32px;
+nav h1 {
+  font-family: var(--secondary-font);
+  font-size: 32px;
 }
 
-.judul{
+.judul {
   font-size: 34px;
   font-weight: 800;
   font-family: var(--secondary-font);
@@ -156,44 +237,44 @@ nav h1{
   color: black;
 }
 
-.table-container{
+.table-container {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.dashboard-table{
+.dashboard-table {
   width: 94%;
   font-family: var(--primary-font);
   border: 2px solid black;
 }
-.table-head{
+.table-head {
   border-radius: 10px;
 }
-.table-head th{
+.table-head th {
   background-color: var(--dark);
   padding: 10px;
 }
 
-th{
+th {
   background-color: var(--dark);
   text-align: center;
   text-decoration: none;
   color: var(--white);
 }
 
-th a{
+th a {
   background-color: var(--dark);
   text-align: center;
   text-decoration: none;
   color: var(--white);
 }
 
-tbody{
+tbody {
   text-align: center;
 }
 
-tbody tr td{
+tbody tr td {
   padding: 10px 0;
   border: 2px solid black;
 }
@@ -202,7 +283,7 @@ button {
   font-size: 30px;
   margin-top: 50px;
   padding: 10px 20px;
-  background-color: var(--dark); 
+  background-color: var(--dark);
   color: #fff;
   border: none;
   cursor: pointer;
@@ -215,7 +296,7 @@ button:hover {
   transition: 0.5s;
 }
 
-.dashboard-table button{
+.dashboard-table button {
   font-size: 14px;
   padding: 5px 10px;
   margin: 0;
@@ -231,5 +312,5 @@ button:hover {
 .dashboard-table button:disabled {
   background-color: var(--white);
   border: 1px solid var(--blue);
-  color: black
+  color: black;
 }

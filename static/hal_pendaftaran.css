@@ -1,0 +1,231 @@
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol,
+ul {
+  list-style: none;
+}
+blockquote,
+q {
+  quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: "";
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+:root {
+  --white: #f9f6f4;
+  --dark: #2b2928;
+  --blue: #1c3b68;
+  --primary-font: "Poppins", serif;
+  --secondary-font: "Noticia Text", serif;
+  --tertiary-font: "Lora", serif;
+}
+
+body {
+  height: 1200px;
+}
+
+section {
+  width: 50%; /* Reduced from 80% */
+  position: relative;
+  left: 25%; /* Adjusted to center */
+}
+
+section h1 {
+  margin: 15px 0; /* Reduced from 20px */
+  font-size: 36px; /* Reduced from 48px */
+  text-align: center;
+  border-bottom: 3px solid black;
+}
+
+form {
+  border-radius: 25px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--dark);
+  margin: 0 auto; /* Center the form */
+  width: 100%; /* Make form fill the section */
+  box-sizing: border-box; /* Include padding in width calculation */
+  margin-bottom: 50px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px; /* Reduced from 15px */
+  margin: 20px; /* Added to create space before button */
+}
+
+.form-grid p:nth-child(n + 6):nth-child(-n + 15) {
+  display: flex;
+  flex-direction: column;
+}
+
+form h2 {
+  text-align: left;
+  margin-top: 10px;
+  margin-left: 50px;
+  font-size: 18px; /* Added size */
+}
+
+form p {
+  font-size: 16px; /* Reduced from 18px */
+  font-family: var(--secondary-font);
+  padding: 5px 15px; /* Increased from 3px 10px */
+  display: flex;
+  flex-direction: column;
+}
+
+form ul {
+  font-family: var(--primary-font);
+  font-size: 18px;
+  padding-top: 20px;
+  text-align: center;
+}
+
+form p label {
+  padding-bottom: 5px; /* Reduced from 10px */
+  font-size: 20px; /* Increased from 16px */
+  font-weight: 500;
+}
+
+form p select,
+form p input {
+  font-size: 14px; /* Reduced from 16px */
+  padding: 8px; /* Increased padding for better appearance */
+  font-family: var(--primary-font);
+  border-radius: 5px;
+  max-width: 300px; /* Increased from 220px */
+  width: 100%; /* Make responsive within max-width */
+}
+
+/* Add style for help text */
+form p .helptext {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+}
+
+form button {
+  font-size: 18px; /* Reduced from 24px */
+  font-weight: 600;
+  font-family: var(--primary-font);
+  padding: 5px 0;
+  margin: 0 30px 30px 30px; /* Adjusted margins */
+  border-radius: 25px;
+  border-color: transparent;
+  color: white;
+  background-color: var(--blue);
+}

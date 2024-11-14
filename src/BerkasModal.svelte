@@ -278,26 +278,31 @@
         padding: 2px 8px;
     }
     .jenis-container {
-        /* margin-top: 2rem; */
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        justify-content: center ;
+        justify-content: center;
         width: 100%;
+        gap: 5px;
+        margin-bottom: 1rem;
     }
+
     .jenis-chip {
-        background-color: #f1f1f1;
+        width: 180px;
+        height: 30px;
+        background-color: var(--dark-color);
         cursor: pointer;
-        color: black;
-        margin: 5px;
-        padding: 5px 10px;
-        border-radius: 5px;
+        color: white;
+        padding: 10px;
+        border-radius: var(--border-radius);
         display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
     }
     .jenis-chip.selected {
-        border: 1px solid #007bff;
+        color: white;
+        background-color: #1c3b68;
         /* border-color: #007bff; */
         /* color: white; */
     }
@@ -382,7 +387,6 @@
     .add-berkas-button:hover {
         background-color: #218838;
     }
-   
 
     .berkas-viewer {
         margin-bottom: 20px;
