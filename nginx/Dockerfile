@@ -8,7 +8,7 @@ COPY nginx/nginx.conf /etc/nginx/nginx.conf
 # COPY ./staticfiles_build/static /usr/share/nginx/html/static
 
 # Expose port 80 for Nginx
-EXPOSE 80
+# EXPOSE 80
 # docker compose up -d --force-recreate nginx
 # docker compose run --rm certbot certonly --webroot -w /var/www/certbot -d labtiums.web.id -d www.labtiums.web.id
 

@@ -2,12 +2,14 @@
 .vscode
 .history
 .env
+certs
 .vercel
 ssh
+staticfiles
 staticfiles_build
 django-env
 web_laboratorium.zip
-db.sqlite3
+# db.sqlite3
 data.json
 node_modules
 media/uploads
