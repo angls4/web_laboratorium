@@ -1,74 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Noticia+Text:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>
-            {% block title %}Pendaftaran{% endblock title %}
-        </title>
-        {% load static %}
-        <link rel="stylesheet" href="{% static 'pendaftaran.css' %}">
-    </head>
-    <header>
-        <nav>
-            <h1>Industrial<br> Laboratory <br><span>UMS</span></h1>
-            <img src="{% static 'Logolab.png' %}" alt="Logo">
-            {% include 'navbar.html' %}
-        </nav>
-        </header>
-    <body>
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Noticia+Text:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Pendaftaran{% endblock title %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'hal_pendaftaran.css' %}" />
+  </head>
+  <header>
+    <nav>
+      <h1>
+        Industrial<br />
+        Laboratory <br /><span>UMS</span>
+      </h1>
+      <img src="{% static 'Logolab.png' %}" alt="Logo" />
+      {% include 'navbar.html' %}
+    </nav>
+  </header>
+  <body>
     {% block content %}
 
-        <section>
-        <h1>Halaman Pendaftaran</h1>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            {% if invalid %}
-            <h2>Upload gagal!</h2>
-            {% endif %}
-            {% if upload_success %}
-            <h2>Upload successful!</h2>
-            {% endif %}
-            <button type="submit">Upload</button>
-        </form>
-        </section>
+    <section>
+      <h1>Halaman Pendaftaran</h1>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-grid">{{ form.as_p }}</div>
+        {% if invalid %}
+        <h2>Upload gagal!</h2>
+        {% endif %} {% if upload_success %}
+        <h2>Upload successful!</h2>
+        {% endif %}
+        <button type="submit">Upload</button>
+      </form>
+    </section>
     {% endblock content %}
-    </body>
-    </html>
+  </body>
+</html>
 
-{% comment %} 
+{% comment %}
 <form method="post" enctype="multipart/form-data">
-    <input type="hidden" name="csrfmiddlewaretoken" value="SHeqzx0Ss7iFxm1suuFdf7VTcU7rCAKPovlvcb3O1ZOlblia4fh00LDZsygN02Ye">
-    <p>
-        <label for="id_file">File:</label>
-        <input type="file" name="file" id="id_file" accept=".zip,.rar" required="">
-    </p>
+  <input
+    type="hidden"
+    name="csrfmiddlewaretoken"
+    value="SHeqzx0Ss7iFxm1suuFdf7VTcU7rCAKPovlvcb3O1ZOlblia4fh00LDZsygN02Ye" />
+  <p>
+    <label for="id_file">File:</label>
+    <input
+      type="file"
+      name="file"
+      id="id_file"
+      accept=".zip,.rar"
+      required="" />
+  </p>
 
-    <p>
-        <label for="id_praktikum">Praktikum:</label>
-        <select name="praktikum" required="" id="id_praktikum">
-            <option value="" selected="">---------</option>
+  <p>
+    <label for="id_praktikum">Praktikum:</label>
+    <select name="praktikum" required="" id="id_praktikum">
+      <option value="" selected="">---------</option>
 
-            <option value="0">Pemrograman Komputer</option>
+      <option value="0">Pemrograman Komputer</option>
 
-            <option value="1">AStatisika</option>
+      <option value="1">AStatisika</option>
 
-            <option value="2">Perancangan Teknik Industri</option>
-        </select>    
-    </p>
+      <option value="2">Perancangan Teknik Industri</option>
+    </select>
+  </p>
 
-    <p>
-        <label for="id_ipk">Ipk:</label>
-        <input type="number" name="ipk" step="0.01" required="" id="id_ipk">    
-    </p>
+  <p>
+    <label for="id_ipk">Ipk:</label>
+    <input type="number" name="ipk" step="0.01" required="" id="id_ipk" />
+  </p>
 
-    <p>
-        <label for="id_nilai">Nilai:</label>
-        <input type="number" name="nilai" step="1" required="" id="id_nilai">
-    </p>
-    <button type="submit">Upload</button>
-</form> {% endcomment %}
+  <p>
+    <label for="id_nilai">Nilai:</label>
+    <input type="number" name="nilai" step="1" required="" id="id_nilai" />
+  </p>
+  <button type="submit">Upload</button>
+</form>
+{% endcomment %}
