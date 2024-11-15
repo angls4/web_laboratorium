@@ -38,16 +38,16 @@
         
         // force structure
         inputTesMicroteaching = {
-            nilai: pendaftaran?.nilai_tm?.nilai ?? 0,
+            pm: pendaftaran?.nilai_tm?.pm ?? 0,
+            km: pendaftaran?.nilai_tm?.km ?? 0,
+            pa: pendaftaran?.nilai_tm?.pa ?? 0,
+            kmp: pendaftaran?.nilai_tm?.kmp ?? 0,
+            sp: pendaftaran?.nilai_tm?.sp ?? 0,
             komentar: pendaftaran?.nilai_tm?.komentar ?? ""
         };
 
         inputTesPemahaman = {
-            pm: pendaftaran?.nilai_tp?.pm ?? 0,
-            km: pendaftaran?.nilai_tp?.km ?? 0,
-            pa: pendaftaran?.nilai_tp?.pa ?? 0,
-            kmp: pendaftaran?.nilai_tp?.kmp ?? 0,
-            sp: pendaftaran?.nilai_tp?.sp ?? 0,
+            nilai: pendaftaran?.nilai_tp?.nilai ?? 0,
             komentar: pendaftaran?.nilai_tp?.komentar ?? ""
         };
 
@@ -198,8 +198,12 @@
                         <!-- <h2>Tes Microteaching</h2> -->
                         <label></label>
                         <label>Skala Nilai: 1 - 100</label>
-                        <label>Nilai: <input type="number" min="1" max="100" bind:value={inputTesMicroteaching.nilai} readonly={!user.is_superuser || selection_status !== 2} on:input={(e) => handleInputChange(e, 'nilai', 'microteaching')} /></label>
-                        <label>Komentar: <textarea bind:value={inputTesMicroteaching.komentar} readonly={!user.is_superuser || selection_status !== 2} on:input={(e) => handleInputChange(e, 'komentar', 'microteaching')}></textarea></label>
+                            <label>Penguasaan Materi: <input type="number" min="1" max="100" bind:value={inputTesMicroteaching.pm} readonly={!user.is_superuser || selection_status !== 2} on:input={(e) => handleInputChange(e, 'pm', 'microteaching')} /></label>
+                            <label>Kemampuan Menjelaskan: <input type="number" min="1" max="100" bind:value={inputTesMicroteaching.km} readonly={!user.is_superuser || selection_status !== 2} on:input={(e) => handleInputChange(e, 'km', 'microteaching')} /></label>
+                            <label>Penguasaan Audience: <input type="number" min="1" max="100" bind:value={inputTesMicroteaching.pa} readonly={!user.is_superuser || selection_status !== 2} on:input={(e) => handleInputChange(e, 'pa', 'microteaching')} /></label>
+                            <label>Kemampuan Menjawab Pertanyaan: <input type="number" min="1" max="100" bind:value={inputTesMicroteaching.kmp} readonly={!user.is_superuser || selection_status !== 2} on:input={(e) => handleInputChange(e, 'kmp', 'microteaching')} /></label>
+                            <label>Sikap Presentasi: <input type="number" min="1" max="100" bind:value={inputTesMicroteaching.sp} readonly={!user.is_superuser || selection_status !== 2} on:input={(e) => handleInputChange(e, 'sp', 'microteaching')} /></label>
+                            <label>Komentar: <textarea bind:value={inputTesMicroteaching.komentar} readonly={!user.is_superuser || selection_status !== 2} on:input={(e) => handleInputChange(e, 'komentar', 'microteaching')}></textarea></label>
                         {#if user.koordinator && selection_status === 2}
                         <div>
                             <button on:click={handleSimpan}>Simpan</button>
@@ -216,11 +220,7 @@
                         <!-- <h2>Tes Pemahaman</h2> -->
                         <label></label>
                         <label>Skala Nilai: 1 - 100</label>
-                            <label>Penguasaan Materi: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.pm} readonly={!user.is_superuser || selection_status !== 3} on:input={(e) => handleInputChange(e, 'pm', 'pemahaman')} /></label>
-                            <label>Kemampuan Menjelaskan: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.km} readonly={!user.is_superuser || selection_status !== 3} on:input={(e) => handleInputChange(e, 'km', 'pemahaman')} /></label>
-                            <label>Penguasaan Audience: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.pa} readonly={!user.is_superuser || selection_status !== 3} on:input={(e) => handleInputChange(e, 'pa', 'pemahaman')} /></label>
-                            <label>Kemampuan Menjawab Pertanyaan: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.kmp} readonly={!user.is_superuser || selection_status !== 3} on:input={(e) => handleInputChange(e, 'kmp', 'pemahaman')} /></label>
-                            <label>Sikap Presentasi: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.sp} readonly={!user.is_superuser || selection_status !== 3} on:input={(e) => handleInputChange(e, 'sp', 'pemahaman')} /></label>
+                           <label>Nilai: <input type="number" min="1" max="100" bind:value={inputTesPemahaman.nilai} readonly={!user.is_superuser || selection_status !== 3} on:input={(e) => handleInputChange(e, 'nilai', 'pemahaman')} /></label>
                             <label>Komentar: <textarea bind:value={inputTesPemahaman.komentar} readonly={!user.is_superuser || selection_status !== 3} on:input={(e) => handleInputChange(e, 'komentar', 'pemahaman')}></textarea></label>
                         {#if user.koordinator && selection_status === 3}
                         <div>
@@ -264,7 +264,7 @@
                         {#if user.koordinator && selection_status === 5}
                         <div>
                             <button on:click={handleSimpan}>Simpan</button>
-                            <button on:click={handleLanjut}>Lanjut</button>
+                            <button on:click={handleLanjut}>Terima</button>
                         </div>
                         {:else}
                         <div>

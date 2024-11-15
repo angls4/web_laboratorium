@@ -1,6 +1,4 @@
-import json
-from math import e
-import re
+from web_laboratorium.apps.app_main.utils import extension_to_mime, send_email, loa_attatchment, send_status_email
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -60,10 +58,14 @@ class Praktikum(models.Model):
     def getDict(self):
         return {
             "id": self.id,
-            "nama   ": self.praktikum_name,
+            "nama": self.praktikum_name,
+            "praktikum_name": self.praktikum_name,
             "semester": self.semester,
             "matkul": self.matkul.nama_matkul,
         }
+    
+    # def __repr__(self):
+    #     return self.getDict()
 
 class Asisten(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -131,16 +133,6 @@ class Persyaratan(models.Model):
 tes_microteaching_schema = {
     "type": "object",
     "properties": {
-        "nilai": {"type": "integer", "minimum": 1, "maximum": 100},
-        "komentar": {"type": "string"},
-    },
-    "additionalProperties": False,
-    "required": ["nilai", "komentar"],
-}
-
-tes_pemahaman_schema = {
-    "type": "object",
-    "properties": {
         "pm": {"type": "integer", "minimum": 1, "maximum": 100},
         "km": {"type": "integer", "minimum": 1, "maximum": 100},
         "pa": {"type": "integer", "minimum": 1, "maximum": 100},
@@ -150,6 +142,16 @@ tes_pemahaman_schema = {
     },
     "additionalProperties": False,
     "required": ["pm", "km", "pa", "kmp", "sp", "komentar"],
+}
+
+tes_pemahaman_schema = {
+    "type": "object",
+    "properties": {
+        "nilai": {"type": "integer", "minimum": 1, "maximum": 100},
+        "komentar": {"type": "string"},
+    },
+    "additionalProperties": False,
+    "required": ["nilai", "komentar"],
 }
 
 wawancara_schema = {
@@ -356,6 +358,36 @@ class Pendaftaran(models.Model):
         self.save()
         return self.catatan_status(status)
 
+# pendaftaran = Pendaftaran.objects.get(id=form.cleaned_data["id"])
+#                         if form.cleaned_data["selection_status"]:
+#                             # print(pendaftaran.status, form.cleaned_data["selection_status"])
+#                             if pendaftaran.status != int(form.cleaned_data["selection_status"]):
+#                                 status_label = dict(form.fields["selection_status"].choices)[int(form.cleaned_data["selection_status"])]
+#                                 send_status_email(pendaftaran.user, pendaftaran, status_label)
+#                                 # try:
+#                                 # except:
+#                                 #     print("Email failed to send", f'{pendaftaran.user.email} {form.cleaned_data["selection_status"]}')
+#                             pendaftaran.selection_status = form.cleaned_data["selection_status"]
+#                             pendaftaran.save()
+#                         # print(pendaftaran.status)
+#                         pendaftaran = Pendaftaran.objects.get(id=form.cleaned_data["id"])
+#                         if pendaftaran.status == 6:
+#                             # pendaftaran.user.is_staff = True
+#                             # pendaftaran.user.save()
+#                             if not Asisten.objects.filter(user=pendaftaran.user, praktikum=pendaftaran.praktikum).exists():
+#                                 asisten = Asisten.objects.create(user=pendaftaran.user, praktikum=pendaftaran.praktikum, periode=pendaftaran.uploaded_at.year)
+#                                 praktikum_periode = f"{pendaftaran.praktikum.praktikum_name} {asisten.periode}"
+#                                 send_email(
+#                                     [pendaftaran.user.email],
+#                                     f"PENGUMUMAN TAHAP AKHIR OPEN RECRUITMENT ASISTEN {praktikum_periode}",
+#                                     "email/pengumuman_email.html",
+#                                     {
+#                                         "praktikum": pendaftaran.praktikum,
+#                                         "praktikum_periode": praktikum_periode,
+#                                     },
+#                                     attachments=[loa_attatchment(pendaftaran)]
+#                                 )
+
     def next_status(self):
         if self.selection_status == 6 or self.selection_status == -1:
             return None
@@ -364,6 +396,22 @@ class Pendaftaran(models.Model):
         if self.selection_status == 1 and self.berkas_revision["unrevised"] > 0:
             return None
         self.selection_status += 1
+        if self.selection_status == 6:
+            if not Asisten.objects.filter(user=self.user, praktikum=self.praktikum).exists():
+                Asisten.objects.create(user=self.user, praktikum=self.praktikum, periode=self.uploaded_at.year)
+                praktikum_periode = f"{self.praktikum.praktikum_name} {self.uploaded_at.year}"
+                send_email(
+                    [self.user.email],
+                    f"PENGUMUMAN TAHAP AKHIR OPEN RECRUITMENT ASISTEN {praktikum_periode}",
+                    "email/pengumuman_email.html",
+                    {
+                    "praktikum": self.praktikum,
+                    "praktikum_periode": praktikum_periode,
+                    },
+                    attachments=[loa_attatchment(self)]
+                )
+        else:
+            send_status_email(self.user, self, self.get_selection_status_display())
         self.save()
         return self.selection_status
 
@@ -397,6 +445,23 @@ class Berkas(models.Model):
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
             self.file.name = f"{self.pendaftaran.user.nim}_{self.pendaftaran.praktikum.praktikum_name}_{current_year}_{timestamp}{self.file.name[self.file.name.rfind('.'):]}"
         super().save(*args, **kwargs)
+
+    def getDict(self):
+        return {
+            "id": self.id,
+            "file_url": self.file.url,
+            "file_name": self.file.name,
+            "file_type": extension_to_mime(self.file.name.split(".")[-1]),
+            "uploaded_at": self.uploaded_at.strftime("%d %b %Y %H:%M"),
+            "komentars": [
+                {
+                    "user": komentar.user.first_name,
+                    "content": komentar.content,
+                    "created_at": komentar.created_at.strftime("%d %b %Y %H:%M"),
+                }
+                for komentar in self.komentar_set.all()
+            ],
+        }
     # def asisten(self):
     # return self.file.name
     # catatan = models.TextField(null=True, blank=True)

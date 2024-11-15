@@ -1,69 +1,21 @@
 import json
-from multiprocessing import context
-from threading import Thread
-from webbrowser import get
 from django.shortcuts import redirect, render
 from django.http import HttpResponseNotFound
 from django.conf import settings
-from django.template import Context, Template
 
 from web_laboratorium.apps.app_main.loa import loa_attatchment
-from .forms import FormPersyaratan, UploadPendaftaran, UpdatePendaftaran
+from .forms import FormPersyaratan, UploadPendaftaran
 from .models import Pendaftaran, Persyaratan, Praktikum, NILAI_CHOICES
 from django.contrib.auth.decorators import login_required, user_passes_test
 import datetime
-from django.forms import formset_factory
-from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseForbidden
 from django.template.loader import render_to_string
 
 from django.contrib.auth import get_user_model
 from .models import Asisten
-from django.http import JsonResponse
+from web_laboratorium.apps.app_main.utils import send_email
 
 User = get_user_model()
-
-def send_email_thread(targets, subject, text_path, html_path = None, context = None, attatchments = None):
-    sender = settings.EMAIL_FROM_ADDRESS
-    if context is None:
-        context = {}
-    if settings.EMAIL_DESTINATION:
-        targets = [settings.EMAIL_DESTINATION]
-
-    subject = Template(subject).render(Context(context))
-    try:
-        html = render_to_string(html_path, context)
-    except:
-        html = None
-    try:
-        text = render_to_string(text_path, context)
-    except:
-        text = html
-
-    mail = EmailMultiAlternatives(subject, text, sender, targets)
-    if html:
-        mail.attach_alternative(html, "text/html")
-    if attatchments:
-        for attatchment in attatchments:
-            mail.attach(*attatchment)
-    mail.send()
-
-
-def send_email(targets, subject, html_path = None, context=None, thread=True, text_path=None, attatchments=None):
-    if thread:
-        t = Thread(target=send_email_thread, args=(targets, subject, text_path, html_path, context, attatchments))
-        t.start()
-    else:
-        send_email_thread(targets, subject, text_path, html_path, context, attatchments)
-
-def send_status_email(user, pendaftaran, newStatus, thread=True):    
-    subject = "Status Pendaftaran Praktikum"
-    context = {
-        "nama": user.first_name,
-        "praktikum": pendaftaran.praktikum.praktikum_name,
-        "status": newStatus,
-    }
-    send_email([user.email], subject, "email/status_email.html", context, thread)
 
 
 # Rest of the code
@@ -237,7 +189,7 @@ def pendaftaran(request,id=None):
 #                                         "praktikum": pendaftaran.praktikum,
 #                                         "praktikum_periode": praktikum_periode,
 #                                     },
-#                                     attatchments=[loa_attatchment(pendaftaran)]
+#                                     attachments=[loa_attatchment(pendaftaran)]
 #                                 )
 #         files = Pendaftaran.objects.all()
 #         if tahun_filter:
@@ -412,7 +364,7 @@ def send_loa(request, pendaftaran_id):
                     {
                         "pendaftaran": pendaftaran,
                     },
-                    attatchments=[loa_attatchment(pendaftaran)],
+                    attachments=[loa_attatchment(pendaftaran)],
                 )
             except:
                 return render(request, "email_not_sent.html", {"message": "Email LOA gagal dikirim.", "verify_link": f"/send-loa/{pendaftaran_id}"})

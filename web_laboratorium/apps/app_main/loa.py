@@ -2,9 +2,7 @@ from fpdf import FPDF
 from datetime import datetime
 import locale
 
-from web_laboratorium.apps.app_main.models import Pendaftaran
-
-def generate_loa_pdf(pendaftaran:Pendaftaran):
+def generate_loa_pdf(pendaftaran):
     pdf = FPDF()
     pdf.add_page()
 
@@ -99,5 +97,5 @@ def generate_loa_pdf(pendaftaran:Pendaftaran):
     # Output the PDF
     return pdf.output(dest='S').encode('latin1')
 
-def loa_attatchment(pendaftaran:Pendaftaran):
+def loa_attatchment(pendaftaran):
     return (f"LOA_{pendaftaran.user.first_name.upper()}_{pendaftaran.user.nim.upper()}_{pendaftaran.praktikum.praktikum_name.upper()}.pdf", generate_loa_pdf(pendaftaran), "application/pdf")

@@ -1,12 +1,12 @@
 <!-- src/Dashboard.svelte -->
 <script>
     import {string_to_pdf} from './pdf-utils'
-    import BerkasModal from './BerkasModal.svelte';
+    import ModalBerkas from './ModalBerkas.svelte';
     import axios from 'axios';
     import {deletePendaftaran, getBerkasesList, getPendaftaran, nextStatus} from '@/beerkasApi';
   import ModalPenilaian from './ModalPenilaian.svelte';
 
-    let berkasModal;
+    let modalBerkas;
 
     let ticker = 1;
 
@@ -85,18 +85,18 @@
     }
 
     function closeBerkasModal() {
-        if (berkasModal)
-            berkasModal.closeBerkasModal();
+        if (modalBerkas)
+            modalBerkas.closeBerkasModal();
         else
-            console.log('berkasModal is not defined');
+            console.log('modalBerkas is not defined');
     }
     async function openBerkasModal(pendaftaran) {
         if (selectedPendaftaran.id !== pendaftaran.id)
-            berkasModal.changePendaftaran(pendaftaran, await getBerkasesList(pendaftaran));
-        if (berkasModal)
-            berkasModal.openModal();
+            modalBerkas.changePendaftaran(pendaftaran, await getBerkasesList(pendaftaran));
+        if (modalBerkas)
+            modalBerkas.openModal();
         else
-            console.log('berkasModal is not defined');
+            console.log('modalBerkas is not defined');
     }
 
     async function generatePDF() {
@@ -161,11 +161,11 @@
     }
 
 </script>
-<BerkasModal bind:rows={rows} bind:user={user} bind:ticker={ticker} bind:this={berkasModal} bind:pendaftaran={selectedPendaftaran} bind:berkasesList={selectedBerkasesList}>
+<ModalBerkas bind:rows={rows} bind:user={user} bind:ticker={ticker} bind:this={modalBerkas} bind:pendaftaran={selectedPendaftaran} bind:berkasesList={selectedBerkasesList}>
     <div slot="header">
         <h1>Berkas-Berkas Pendaftaran</h1>
     </div>
-</BerkasModal>
+</ModalBerkas>
 <ModalPenilaian bind:user={user} bind:this={penilaianModal} bind:rows={rows}></ModalPenilaian>
 
 

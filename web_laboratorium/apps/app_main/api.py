@@ -1,23 +1,11 @@
 import datetime
 import json
-import mimetypes
-from operator import ne
 from django.http import HttpResponseForbidden, HttpResponseNotFound, JsonResponse
 
 from web_laboratorium.apps.app_main.models import Asisten, Berkas, Pendaftaran, Praktikum
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.template.loader import render_to_string
 
-
-def extension_to_mime(extension):
-    if not extension.startswith('.'):
-        extension = f'.{extension}'
-    if extension == ".webp":
-        return "image/webp"
-
-    mime_type, _ = mimetypes.guess_type(f"file{extension}")
-    
-    return mime_type
 
 @login_required
 def dashboard_pdf(request):
@@ -44,7 +32,7 @@ def dashboard_pdf(request):
         if status_filter:
             filter_kwargs["selection_status"] = int(status_filter)
         if not request.user.is_superuser:
-            filter_kwargs["praktikum"] = request.user.asisten.praktikum
+            filter_kwargs["persyaratan__praktikum"] = request.user.asisten.praktikum
         pendaftarans = Pendaftaran.objects.filter(**filter_kwargs).order_by(sort_by)
     else:
         pendaftarans = Pendaftaran.objects.filter(user=request.user)
@@ -68,44 +56,8 @@ def dashboard_pdf(request):
     html_string = render_to_string("dashboard_pdf.html", pdf_context)
     return JsonResponse({"html_string": html_string, "status": 200, "file_name": file_name})
 
-# def asisten(request):
-#     periode_filter = request.GET.get('periode') or ''
-#     praktikum_filter = request.GET.get('praktikum') or ''
-#     sort_by = request.GET.get('sort_by', 'created_at')
-#     if not sort_by:
-#                sort_by = "created_at"
-#     order = request.GET.get('order', 'asc')
-#     if not order:
-#         order = 'asc'
-
-#     rows = Asisten.objects.all()
-#     for row in rows:
-#         row.nama = row.user.first_name
-#         row.nama_praktikum = row.praktikum.praktikum_name
-#     reversed_columns = ["nama", "nama_praktikum"]
-#     rows = sorted(rows, key=lambda x: x.__dict__[sort_by], reverse=True if order == ('desc' if sort_by not in reversed_columns else 'asc') else False)
-#     if periode_filter:
-#         rows = list(filter(lambda x: x.periode == periode_filter, rows))
-#         print(rows)
-#     if praktikum_filter:
-#         rows = list(filter(lambda x: x.nama_praktikum == praktikum_filter, rows))
-
-#     praktikum_options = Praktikum.objects.all()
-#     periode_options = range(2018, 2026)
-
-#     context = {
-#         "rows": rows,
-#         "praktikum_options": praktikum_options,
-#         "periode_options": periode_options,
-#     }
-#     context["html_string"] = render_to_string("asisten_pdf.html", {
-#         "rows": rows,
-#         "date": datetime.datetime.now().strftime("%d %B %Y %H:%M"),
-#         "periode_filter": periode_filter,
-#         "praktikum_filter": praktikum_filter,
-#     })
-#     return render(request, 'asisten.html', context)
-
+@login_required
+@user_passes_test(lambda u: u.asisten)
 def asisten_pdf(request):
     periode_filter = request.GET.get("periode") or ""
     praktikum_filter = request.GET.get("praktikum") or ""
@@ -150,7 +102,8 @@ def asisten_pdf(request):
     return JsonResponse({"html_string": html_string, "status": 200, "file_name": file_name})
     
 
-
+@login_required
+@user_passes_test(lambda u: u.koordinator)
 def next_status(request):
     id = request.POST.get("id")
     data = None
@@ -170,6 +123,8 @@ def next_status(request):
         return JsonResponse({"status": status, "next_status": new_status, "nilai": nilai})
     return JsonResponse({"status": -1}, status=400)
 
+@login_required
+@user_passes_test(lambda u: u.koordinator)
 def set_nilai(request,id):
     # id = request.POST.get("id")
     # status = request.POST.get("status")
@@ -193,6 +148,7 @@ def set_nilai(request,id):
 #         return JsonResponse({"status": 200, "catatan": new_catatan})
 #     return JsonResponse({"status": -1}, status=400)
 
+@login_required
 def delete_pendaftaran(request):
     id = request.POST.get("id")
     try:
@@ -204,23 +160,8 @@ def delete_pendaftaran(request):
     except Pendaftaran.DoesNotExist:
         return HttpResponseNotFound("Pendaftaran tidak ada")
 
-def flat_berkas(berkas):
-    return {
-        "id": berkas.id,
-        "file_url": berkas.file.url,
-        "file_name": berkas.file.name,
-        "file_type": extension_to_mime(berkas.file.name.split(".")[-1]),
-        "uploaded_at": berkas.uploaded_at.strftime("%d %b %Y %H:%M"),
-        "komentars": [
-            {
-                "user": komentar.user.first_name,
-                "content": komentar.content,
-                "created_at": komentar.created_at.strftime("%d %b %Y %H:%M"),
-            }
-            for komentar in berkas.komentar_set.all()
-        ],
-    }
 
+@login_required
 def get_berkasesList(request):
     id = request.GET.get("id")
     try:
@@ -239,8 +180,8 @@ def get_berkasesList(request):
             try:
                 berkases = pendaftaran.berkas_set.filter(jenis=jenis_value).order_by("uploaded_at").reverse()
                 item["berkases"] = [
-                    flat_berkas(b)
-                    for b in berkases
+                    berkas.getDict()
+                    for berkas in berkases
                 ]
             except Berkas.DoesNotExist:
                 pass
@@ -249,6 +190,7 @@ def get_berkasesList(request):
     except Pendaftaran.DoesNotExist:
         return HttpResponseNotFound("Pendaftaran tidak ada")
 
+@login_required
 def get_berkases(request):
     id = request.GET.get("id")
     jenis = request.GET.get("jenis")
@@ -264,13 +206,14 @@ def get_berkases(request):
                     "status": 200,
                     "berkas_revision": pendaftaran.berkas_revision,
                     "revision": pendaftaran.jenis_revision(jenis),
-                    "berkases": [flat_berkas(b) for b in berkases],
+                    "berkases": [berkas.getDict() for berkas in berkases],
                 }
             )
         except Berkas.DoesNotExist:
             return HttpResponseNotFound("Berkas tidak ada")
     return JsonResponse({"status": -1}, status=400)
 
+@login_required
 def get_berkas(request):
     id = request.GET.get("id")
     try:
@@ -283,12 +226,13 @@ def get_berkas(request):
                 "status": 200,
                 "berkas_revision": pendaftaran.berkas_revision,
                 "revision": pendaftaran.jenis_revision(berkas.jenis),
-                "berkas": flat_berkas(berkas),
+                "berkas": berkas.getDict(),
             }
         )
     except Berkas.DoesNotExist:
         return HttpResponseNotFound("Berkas tidak ada")
 
+@login_required
 def get_pendafataran(request):
     id = request.GET.get("id")
     try:
@@ -304,6 +248,7 @@ def get_pendafataran(request):
     except Pendaftaran.DoesNotExist:
         return HttpResponseNotFound("Pendaftaran tidak ada")
 
+@login_required
 def add_berkas(request):
     id = request.POST.get("id")
     jenis = request.POST.get("jenis")
@@ -318,6 +263,7 @@ def add_berkas(request):
         return JsonResponse({"status": 200})
     return JsonResponse({"status": -1}, status=400)
 
+@login_required
 def komentar_berkas(request):
     id = request.POST.get("id")
     komentar = request.POST.get("komentar")

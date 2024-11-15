@@ -88,7 +88,7 @@ class UMSUser(AbstractBaseUser, PermissionsMixin):
         if self.is_superuser:
             return "Admin"
         try:
-            return self.asisten_set.get(divisi="Koordinator", periode=current_year).praktikum
+            return self.asisten_set.get(divisi="Koordinator", periode=current_year).praktikum.getDict()
             return True
         except:
             return None
