@@ -33,9 +33,9 @@ def dashboard_pdf(request):
             filter_kwargs["selection_status"] = int(status_filter)
         if not request.user.is_superuser:
             filter_kwargs["persyaratan__praktikum"] = request.user.asisten.praktikum
-        pendaftarans = Pendaftaran.objects.filter(**filter_kwargs).order_by(sort_by)
+        pendaftarans = Pendaftaran.objects.filter(deleted_at__isnull=True, **filter_kwargs).order_by(sort_by)
     else:
-        pendaftarans = Pendaftaran.objects.filter(user=request.user)
+        pendaftarans = Pendaftaran.objects.filter(deleted_at__isnull=True, user=request.user)
 
     rows = pendaftarans
 
@@ -113,7 +113,7 @@ def next_status(request):
         pass
     if id:
         nilai = None
-        pendaftaran = Pendaftaran.objects.get(id=id)
+        pendaftaran = Pendaftaran.objects.get(deleted_at__isnull=True, id=id)
         if data:
             nilai = pendaftaran.set_nilai_status(data)
         if pendaftaran.berkas_revision["unrevised"] > 0:
@@ -131,7 +131,7 @@ def set_nilai(request,id):
     try:
         data = json.loads(request.body)
         if id and data:
-            pendaftaran = Pendaftaran.objects.get(id=id)
+            pendaftaran = Pendaftaran.objects.get(deleted_at__isnull=True, id=id)
             nilai = pendaftaran.set_nilai_status(data)
             return JsonResponse({"status": 200, "nilai": nilai})
     except:
@@ -143,7 +143,7 @@ def set_nilai(request,id):
 #     catatan = request.POST.get("catatan")
 #     status = request.POST.get("status")
 #     if id and catatan and status:
-#         pendaftaran = Pendaftaran.objects.get(id=id)
+#         pendaftaran = Pendaftaran.objects.get(deleted_at__isnull=True, id=id)
 #         new_catatan = pendaftaran.set_catatan_status(catatan, status)
 #         return JsonResponse({"status": 200, "catatan": new_catatan})
 #     return JsonResponse({"status": -1}, status=400)
@@ -152,10 +152,11 @@ def set_nilai(request,id):
 def delete_pendaftaran(request):
     id = request.POST.get("id")
     try:
-        pendaftaran = Pendaftaran.objects.get(pk=id)
+        pendaftaran = Pendaftaran.objects.get(deleted_at__isnull=True, pk=id)
         if pendaftaran.user != request.user and not request.user.koordinator:
             return HttpResponseForbidden("Bukan pendaftar")
-        pendaftaran.delete()
+        # pendaftaran.delete()
+        pendaftaran.deleted_at = datetime.datetime.now()
         return JsonResponse({"status": 200})
     except Pendaftaran.DoesNotExist:
         return HttpResponseNotFound("Pendaftaran tidak ada")
@@ -165,7 +166,7 @@ def delete_pendaftaran(request):
 def get_berkasesList(request):
     id = request.GET.get("id")
     try:
-        pendaftaran = Pendaftaran.objects.get(pk=id)
+        pendaftaran = Pendaftaran.objects.get(deleted_at__isnull=True, pk=id)
         if pendaftaran.user != request.user and not request.user.asisten:
             return HttpResponseForbidden("Bukan pendaftar")
         # berkases = pendaftaran.berkas_set.all()
@@ -196,7 +197,7 @@ def get_berkases(request):
     jenis = request.GET.get("jenis")
     if id and jenis:
         try:
-            pendaftaran = Pendaftaran.objects.get(pk=id)
+            pendaftaran = Pendaftaran.objects.get(deleted_at__isnull=True, pk=id)
             if pendaftaran.user != request.user and not request.user.asisten:
                 return HttpResponseForbidden("Bukan pendaftar")
             berkases = pendaftaran.berkas_set.filter(jenis=jenis).order_by("uploaded_at").reverse()
@@ -236,7 +237,7 @@ def get_berkas(request):
 def get_pendafataran(request):
     id = request.GET.get("id")
     try:
-        pendaftaran = Pendaftaran.objects.get(pk=id)
+        pendaftaran = Pendaftaran.objects.get(deleted_at__isnull=True, pk=id)
         if pendaftaran.user != request.user and not request.user.asisten:
             return HttpResponseForbidden("Bukan pendaftar")
         return JsonResponse(
@@ -253,7 +254,7 @@ def add_berkas(request):
     id = request.POST.get("id")
     jenis = request.POST.get("jenis")
     if id and jenis:
-        pendaftaran = Pendaftaran.objects.get(pk=id)
+        pendaftaran = Pendaftaran.objects.get(deleted_at__isnull=True, pk=id)
         if pendaftaran.user != request.user and not request.user.asisten:
             return HttpResponseForbidden("Bukan pendaftar")
         file = request.FILES["file"]

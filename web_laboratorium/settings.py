@@ -131,6 +131,7 @@ STORAGES = {
             "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
             "signature_version": "s3v4",
             "region_name": os.getenv("AWS_S3_REGION_NAME"),
+            "custom_domain": os.getenv("AWS_S3_CUSTOM_DOMAIN"),
         },
     },
     "staticfiles": {

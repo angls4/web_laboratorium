@@ -333,7 +333,7 @@
                                     <p style="margin-top: 5px; font-style:italic">(Berkas Perlu Direvisi)</p>
                                 {/if}
                             {/if}
-                        {:else}
+                        {:else if user.asisten}
                             <button on:click={()=>openPenilaianModal(row)}>
                                 Tinjau Nilai
                             </button>

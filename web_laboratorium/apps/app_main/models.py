@@ -186,6 +186,7 @@ def validate_wawancara(value):
 class Pendaftaran(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     edited_at = models.DateTimeField(null=True, blank=True, default=None)
+    deleted_at = models.DateTimeField(null=True, blank=True, default=None)
     # PRAKTIKUM_CHOICES = (
     #     ('prokom', 'Pemrograman Komputer'),
     #     ('Statis', 'Statisika'),
