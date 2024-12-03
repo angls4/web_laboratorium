@@ -2,11 +2,11 @@
 FROM node:18 AS build
 
 # Set the working directory in the container
+RUN rm -rf /app/staticfiles/*
 WORKDIR /app
 
 # Copy package.json and package-lock.json (or yarn.lock) to the container
 # COPY package*.json ./
-RUN rm -rf ./staticfiles/*
 COPY . .
 
 # Install dependencies (including Vite and other project dependencies)

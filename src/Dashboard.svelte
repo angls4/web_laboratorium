@@ -366,14 +366,14 @@
             </tr>
         {:else}
             <tr>
-                <td colspan={user.asisten ? 10 : 6}>
+                <td colspan={user.asisten ? 10 : 8}>
                     Belum ada pendaftaran. Daftar <a href="/pendaftaran">di sini</a>.
                 </td>
             </tr>
         {/each}
         {#if rows.length > itemsPerPage}
             <tr>
-                <td colspan={user.asisten ? 10 : 6}>
+                <td colspan={user.asisten ? 10 : 8}>
                     <p>Showing {currentPage === totalPages ? filteredRows.length : currentPage * itemsPerPage} of {rows.length} entries</p>
                 </td>
             </tr>

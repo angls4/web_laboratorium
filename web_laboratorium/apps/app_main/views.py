@@ -113,7 +113,7 @@ def pendaftaran(request,id=None):
     context = {}
     if id:
         try:
-            pendaftaran = Pendaftaran.objects.get(pk=id)
+            pendaftaran = Pendaftaran.objects.get(deleted_at__isnull=True, pk=id)
             if pendaftaran.user != request.user and not request.user.koordinator:
                 return HttpResponseForbidden("Bukan pendaftar")
             context = {
@@ -162,7 +162,7 @@ def pendaftaran(request,id=None):
 #             if formSet.is_valid():
 #                 for form in formSet.forms:
 #                     if form.cleaned_data:
-#                         pendaftaran = Pendaftaran.objects.get(id=form.cleaned_data["id"])
+#                         pendaftaran = Pendaftaran.objects.get(deleted_at__isnull=True, id=form.cleaned_data["id"])
 #                         if form.cleaned_data["selection_status"]:
 #                             # print(pendaftaran.status, form.cleaned_data["selection_status"])
 #                             if pendaftaran.status != int(form.cleaned_data["selection_status"]):
@@ -174,7 +174,7 @@ def pendaftaran(request,id=None):
 #                             pendaftaran.selection_status = form.cleaned_data["selection_status"]
 #                             pendaftaran.save()
 #                         # print(pendaftaran.status)
-#                         pendaftaran = Pendaftaran.objects.get(id=form.cleaned_data["id"])
+#                         pendaftaran = Pendaftaran.objects.get(deleted_at__isnull=True, id=form.cleaned_data["id"])
 #                         if pendaftaran.status == 6:
 #                             # pendaftaran.user.is_staff = True
 #                             # pendaftaran.user.save()
@@ -191,7 +191,7 @@ def pendaftaran(request,id=None):
 #                                     },
 #                                     attachments=[loa_attatchment(pendaftaran)]
 #                                 )
-#         files = Pendaftaran.objects.all()
+#         files = Pendaftaran.objects.filter(deleted_at__isnull=True)
 #         if tahun_filter:
 #             files = list(filter(lambda x: x.uploaded_at.year == int(tahun_filter), files))
 #         if nilai_filter:
@@ -227,7 +227,7 @@ def pendaftaran(request,id=None):
 #             "formSet": formSet,
 #         }
 #     else:
-#         files = Pendaftaran.objects.filter(user=request.user)
+#         files = Pendaftaran.objects.filter(deleted_at__isnull=True, user=request.user)
 #         rows = [{"file": file,"form": ''} for file in files]
 #         context = {
 #             "rows": rows,
@@ -288,9 +288,9 @@ def dashboard(request):
     if request.user.asisten:
         if not request.user.is_superuser:
             filter_kwargs["persyaratan__praktikum"] = request.user.asisten.praktikum
-        pendaftarans = Pendaftaran.objects.filter(**filter_kwargs).order_by(sort_by).reverse()
+        pendaftarans = Pendaftaran.objects.filter(deleted_at__isnull=True, **filter_kwargs).order_by(sort_by).reverse()
     else:
-        pendaftarans = Pendaftaran.objects.filter(user=request.user).order_by(sort_by).reverse()
+        pendaftarans = Pendaftaran.objects.filter(deleted_at__isnull=True, user=request.user).order_by(sort_by).reverse()
 
 
     tahun_options = list(range(2015, datetime.datetime.now().year + 4))
@@ -311,7 +311,7 @@ def dashboard(request):
 # @login_required
 # def getFile(request, id):
 #     try:
-#         file = Pendaftaran.objects.get(pk=id)
+#         file = Pendaftaran.objects.get(deleted_at__isnull=True, pk=id)
 #         if file.user == request.user or request.user.asisten:
 #             response = FileResponse(open(file.file.path, "rb"))
 #             return response
@@ -354,7 +354,7 @@ def send_loa(request, pendaftaran_id):
     if not request.user.is_anonymous and not request.user.koordinator:
         return HttpResponseForbidden("You are not authorized to access this page.")
     try:
-        pendaftaran = Pendaftaran.objects.get(pk=pendaftaran_id)
+        pendaftaran = Pendaftaran.objects.get(deleted_at__isnull=True, pk=pendaftaran_id)
         if pendaftaran.status == 6:
             try:
                 send_email(

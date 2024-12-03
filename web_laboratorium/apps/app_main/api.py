@@ -157,6 +157,7 @@ def delete_pendaftaran(request):
             return HttpResponseForbidden("Bukan pendaftar")
         # pendaftaran.delete()
         pendaftaran.deleted_at = datetime.datetime.now()
+        pendaftaran.save()
         return JsonResponse({"status": 200})
     except Pendaftaran.DoesNotExist:
         return HttpResponseNotFound("Pendaftaran tidak ada")
