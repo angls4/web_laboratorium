@@ -444,7 +444,7 @@ class Berkas(models.Model):
         if not self.pk:  # Only if the file is new
             current_year = datetime.now().year
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-            self.file.name = f"{self.pendaftaran.user.nim}_{self.pendaftaran.praktikum.praktikum_name}_{current_year}_{timestamp}{self.file.name[self.file.name.rfind('.'):]}"
+            self.file.name = f"{self.pendaftaran.user.nim}_{self.pendaftaran.praktikum.praktikum_name}_{self.jenis}_{current_year}_{timestamp}{self.file.name[self.file.name.rfind('.'):]}"
         super().save(*args, **kwargs)
 
     def getDict(self):
