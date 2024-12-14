@@ -1,18 +1,18 @@
 version: '3'
 
 services:
-  # database:
-  #   image: postgres:16
-  #   environment:
-  #     POSTGRES_DB: web_laboratorium
-  #     POSTGRES_USER: root
-  #     POSTGRES_PASSWORD: root
-  #   ports:
-  #     - "127.0.0.1:5432:5432"
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   networks:
-  #     - webnet
+  database:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: web_laboratorium
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - webnet
 
   frontend:
     build:
