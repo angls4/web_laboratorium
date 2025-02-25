@@ -46,7 +46,7 @@ GIF demo ada di bawah
 # Demo GIF
 Demo flow atau setiap fitur web untuk role User dan Admin
 ## User
-(demo gif maybe still loading)
+(demo gif maybe still loading (5 MB))
 ![user1](https://github.com/user-attachments/assets/daba0f3c-cb68-49cd-a122-f6417ea3804c)
 - Register
 - Verify Email
@@ -55,7 +55,7 @@ Demo flow atau setiap fitur web untuk role User dan Admin
 - Buat Pendaftaran
 - User Dashboard
 ## Admin
-(demo gif maybe still loading)
+(demo gif maybe still loading (6 MB))
 ![admin3](https://github.com/user-attachments/assets/81a359a2-e736-4a09-be02-2e7d86bcf000)
 - Admin Django Dashboard
 - Admin Dashboard
