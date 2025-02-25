@@ -25,11 +25,11 @@ GIF demo ada di bawah
 ## User Dashboard
 - Edit pendaftaran dan berkas
 - Berkas pendaftaran
-- Filter
+- Pagination dan filter
 - Download PDF
 ## Admin Django Dashboard
 - CRUD untuk Persyaran, Pendaftaran, Asisten
-- Filter
+- Pagination dan filter
 - Download PDF
 ## Admin/Koordinator/Asisten Dashbaord
 - CRUD untuk Pendaftaran
@@ -38,10 +38,10 @@ GIF demo ada di bawah
 - Memasukkan dan meninjau nilai ujian-ujian pendaftaran
 - Melanjutkan step pendaftaran
 - Mengirim LOA (Letter of Acceptance)
-- Filter
+- Pagination dan filter
 - Download PDF
 ## Asisten Dashboard
-- Fileter
+- Pagination dan filter
 - DOwnload PDF
 # Demo GIF
 Demo flow atau setiap fitur web untuk role User dan Admin
@@ -62,7 +62,6 @@ Demo flow atau setiap fitur web untuk role User dan Admin
 - Revisi Berkas Pendaftaran
 - Progress Step Pendaftaran
 - Email Step Pendaftaran dan LOA
-- Filter
 - Download PDF
 - Asisten Dashboard
 - Download PDF
