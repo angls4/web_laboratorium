@@ -1,37 +1,43 @@
-# Sistem Informasi Seleksi Asisten Laboratorium UMS
+# Sistem Informasi Seleksi Asisten Praktikum Laboratorium UMS
 GIF demo ada di bawah
-## Roles
+## Techstack
+- Django
+- Sveltekit (built to static files)
+- PDFKit
+
+## Fitur
+### Roles
 - Admin
 - Asisten
 - Koordinator
 - User (pendaftar)
-## Autentikasi
+### Autentikasi
 - Login
 - Register
 - Verify Email
-## Persyaratan (Pengumuman Pendaftaran)
+### Persyaratan (Pengumuman Pendaftaran)
 - Batas waktu pendaftaran
 - Upload gambar pengumuman
 - Create, Read, Update, Delete
-## Pendaftaran
+### Pendaftaran
 - Verifikasi IPK, semester, batas waktu, file
 - Create, Read, Update, Delete
-## Berkas Pendaftaran
+### Berkas Pendaftaran
 - History file untuk masing-masing berkas
 - Revisi / Komentar untuk setiap file berkas
 - Download file berkas
 - Upload file berkas
 - Tracking jumlah berkas yang butuh revisi dan telah direvisi
-## User Dashboard
+### User Dashboard
 - Edit pendaftaran dan berkas
 - Berkas pendaftaran
 - Pagination dan filter
 - Download PDF
-## Admin Django Dashboard
+### Admin Django Dashboard
 - CRUD untuk Persyaran, Pendaftaran, Asisten
 - Pagination dan filter
 - Download PDF
-## Admin/Koordinator/Asisten Dashbaord
+### Admin/Koordinator/Asisten Dashbaord
 - CRUD untuk Pendaftaran
 - Berkas pendaftaran
 - Email untuk setiap step pendaftaran
@@ -40,23 +46,25 @@ GIF demo ada di bawah
 - Mengirim LOA (Letter of Acceptance)
 - Pagination dan filter
 - Download PDF
-## Asisten Dashboard
+### Asisten Dashboard
 - Pagination dan filter
 - DOwnload PDF
-# Demo GIF
+## Demo GIF
 Demo flow atau setiap fitur web untuk role User dan Admin
-## User
-(demo gif maybe still loading (5 MB))
-![user1](https://github.com/user-attachments/assets/daba0f3c-cb68-49cd-a122-f6417ea3804c)
+### User
+(demo gif maybe still loading (3 MB))
+
+![demo gif User](https://github.com/user-attachments/assets/d07254ea-bb80-4bb9-b1a9-e30524f4706c)
 - Register
 - Verify Email
 - Login
 - Persyaratan (pengumuman pendaftaran)
 - Buat Pendaftaran
 - User Dashboard
-## Admin
-(demo gif maybe still loading (6 MB))
-![admin3](https://github.com/user-attachments/assets/81a359a2-e736-4a09-be02-2e7d86bcf000)
+### Admin
+(demo gif maybe still loading (5 MB))
+
+![demo GIF Admin](https://github.com/user-attachments/assets/7d84c407-d8c8-4833-9629-ca24457f537d)
 - Admin Django Dashboard
 - Admin Dashboard
 - Revisi Berkas Pendaftaran
