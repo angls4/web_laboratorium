@@ -1,4 +1,4 @@
-# Fitur
+# Sistem Informasi Seleksi Asisten Laboratorium UMS
 GIF demo ada di bawah
 ## Roles
 - Admin
